@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
 
 use bytes::Bytes;
 use mini_redis::{Command, Connection, Frame};
 use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::Mutex;
 
 type DB = Arc<Mutex<HashMap<String, Bytes>>>;
 
@@ -38,12 +39,12 @@ async fn process(socket: TcpStream, db: DB) {
     while let Some(frame) = connection.read_frame().await.unwrap() {
         let response = match Command::from_frame(frame).unwrap() {
             Command::Set(cmd) => {
-                let mut db = db.lock().unwrap();
+                let mut db = db.lock().await;
                 db.insert(cmd.key().to_string(), cmd.value().clone());
                 Frame::Simple("OK".to_string())
             }
             Command::Get(cmd) => {
-                let mut db = db.lock().unwrap();
+                let db = db.lock().await;
                 if let Some(value) = db.get(cmd.key()) {
                     Frame::Bulk(value.clone())
                 } else {
