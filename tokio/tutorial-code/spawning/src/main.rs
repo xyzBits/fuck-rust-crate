@@ -25,6 +25,9 @@ async fn main() {
 async fn process(socket: TcpStream) {
 
 
+    // data is not shared across the network, if we launch more than one client,
+    // first set hell, word using first client, and second get hello using second client,
+    // the second client will get (nil)
     // A hashmap is used to share data
     let mut db = HashMap::new();
 
