@@ -9,7 +9,7 @@ mod tests {
     use std::thread;
 
     #[test]
-    fn test_send_value_to_thead() {
+    fn test_send_value_to_thread() {
         let (sender, receiver) = channel();
 
         let handle = thread::spawn(move || {
