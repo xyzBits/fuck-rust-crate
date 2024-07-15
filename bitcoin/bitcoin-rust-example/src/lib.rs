@@ -1,5 +1,8 @@
 mod crypto;
 mod account;
+mod transaction;
+mod signature;
+mod hash;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
