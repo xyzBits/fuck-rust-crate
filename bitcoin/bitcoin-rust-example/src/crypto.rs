@@ -40,3 +40,15 @@ impl Keypair {
 
 
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::crypto::Keypair;
+
+    #[test]
+    fn test_get_key() {
+        let keypair = Keypair::new();
+        println!("{:?}", keypair.public_key());
+    }
+}
