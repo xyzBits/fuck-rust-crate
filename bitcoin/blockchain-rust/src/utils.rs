@@ -51,6 +51,7 @@ pub fn new_key_pair() -> Vec<u8> {
 }
 
 /// ECDSA P256 SHA256 签名
+/// signature = private key + data
 pub fn ecdsa_p256_sha256_sign_digest(pkcs8: &[u8], message: &[u8]) -> Vec<u8> {
     let key_pair = EcdsaKeyPair::from_pkcs8(&ECDSA_P256_SHA256_FIXED_SIGNING, pkcs8).unwrap();
     let rng = SystemRandom::new();
@@ -58,6 +59,7 @@ pub fn ecdsa_p256_sha256_sign_digest(pkcs8: &[u8], message: &[u8]) -> Vec<u8> {
 }
 
 /// ECDSA P256 SHA256 签名验证
+/// public key + data + signature
 pub fn ecdsa_p256_sha256_sign_verify(public_key: &[u8], signature: &[u8], message: &[u8]) -> bool {
     let peer_public_key =
         ring::signature::UnparsedPublicKey::new(&ECDSA_P256_SHA256_FIXED, public_key);
