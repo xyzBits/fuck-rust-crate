@@ -108,19 +108,22 @@ mod tests {
             &vec![],
             0,
         );
+
+        let vec1 = block.serialized();
         println!("new block hash is {}", block.hash)
     }
 
     #[test]
     fn test_block_serialize() {
-        // let tx = Transaction::new_coinbase_tx("Genesis");
-        // let block = Block::new_block(
-        //     String::from("2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"),
-        //     &vec![tx],
-        //     0,
-        // );
-        // let block_bytes = block.serialize();
-        // let desc_block = Block::deserialize(&block_bytes[..]);
-        // assert_eq!(block.hash, desc_block.hash)
+        let tx = Transaction::new_coinbase_tx("Genesis");
+
+        let block = Block::new_block(
+            String::from("2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"),
+            &vec![tx],
+            0,
+        );
+        let block_bytes = block.serialized();
+        let desc_block = Block::deserialize(&block_bytes[..]);
+        assert_eq!(block.hash, desc_block.hash)
     }
 }

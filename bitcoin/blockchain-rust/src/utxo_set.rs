@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-use serde::de::value::I32Deserializer;
-use serde::forward_to_deserialize_any;
+use crate::block::Block;
 use crate::blockchain::Blockchain;
 use crate::transaction::TXOutput;
 
@@ -36,6 +35,22 @@ impl UTXOSet {
         todo!()
     }
 
+    /// 统计 UTXO 集合中的交易数量
+    pub fn count_transactions(&self) -> i32 {
+        todo!()
+    }
+
+
+    /// 重建 UTXO 集合
+    pub fn reindex(&self) {
+
+    }
+
+
+    /// 使用来自区块的交易更新 UTXO 集
+    pub fn update(&self, block: &Block) {
+        todo!()
+    }
 
 
 
