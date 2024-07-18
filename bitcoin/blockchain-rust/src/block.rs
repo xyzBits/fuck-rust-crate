@@ -6,9 +6,16 @@ use crate::utils::{current_timestamp, sha256_digest};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Block {
+    // 当前时间戳，也就是区块创建的时间
     timestamp: i64,
+
+    // 当一个块的哈希，即父哈希
     pre_block_hash: String,
+
+    // 当前块的哈希
     hash: String,
+
+    // 区块存储的实际有效信息，也就是交易
     transactions: Vec<Transaction>,
     nonce: i64,
     height: usize,
