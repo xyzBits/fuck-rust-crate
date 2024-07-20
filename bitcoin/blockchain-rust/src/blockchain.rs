@@ -20,6 +20,18 @@ pub struct Blockchain {
 
 
 impl Blockchain {
+    /// 持久化，new_blockchain 会创建一个新的 Blockchain 实例，并向其中加入创世块，
+    ///     1. 打开一个数据库文件
+    ///     2. 检查文件里面是否已经存储了一个区块链
+    ///     3. 如果已经存储了一个区块链
+    ///         3-1. 创建一个新的 Blockchain 实例
+    ///         3-2. 设置Blockchain 实例的ti为数据库中存储的最后一个块的哈希
+    ///     4. 如果没有区块链
+    ///         4-1. 创建创世区块
+    ///         4-2. 存储到数据库
+    ///         4-3. 将创世区块哈希保存为最后一个块的哈希
+    ///         4-4. 创建一个新的 Blockchain 实例，初始时tip指向创世块，tip 有尾部，尖端的意思 ，在这里，tip存储的是最后一个块的哈希
+    ///
     /// 创建新的区块链
     pub fn create_blockchain(genesis_address: &str) -> Blockchain {
         let db = sled::open(current_dir().unwrap().join("data")).unwrap();
@@ -52,6 +64,7 @@ impl Blockchain {
             Ok(())
         });
     }
+
 
     /// 创建区块链实例
     pub fn new_blockchain() -> Blockchain {
@@ -136,13 +149,28 @@ impl Blockchain {
     }
 }
 
-
+/// 产生的所有块都会被保存到一个数据库里面，所以我们可以重新打开一个链，
+/// 然后向里面加入新块，但是在实现这一点后，
+/// 我们失去了之前非常好的特性，再也无法打印区块链的区块了，
+/// 因为现在不是将区块存储在一个数组，而是放到了数据库里面
+///
+/// DB 允许对一个 bucket 里所有的 key 进行迭代，但是所有的key 以字节序进行存储，
+/// 而且我们想要以区块能够进入区块链中的顺序进行打印，此外，我们不想所有的的区块都加载到内存中，
+/// 因为区块链的数据库可能很大，
+/// 我们将会一个一个地读取它们，因此，需要一个区块链迭代器
+///
 pub struct BlockchainIterator {
     db: Db,
     current_hash: String,
 }
 
-
+/// 每当需要对链中的块进行迭代时，就会创建一个迭代器，里面存储了当前迭代的块哈希和数据库的连接
+/// 通过数据库连接，迭代器逻辑上被附属到一个区块链上，
+/// 这晨的区块链是存储了一个数据库连接的 blockchain 实例，
+/// 并且通过 blockchain 方法进行创建
+/// 注意，迭代器的初始状态为链中的tip，因此 区块将从尾到头，创世块称为头，也就是从最新的到最旧的进行获取，
+/// 实际上，选择一个tip就是意味着给一条链投票，一个链可能有多个分支，最长的那条链就会被认为是主分支，
+/// 在获得一个tip之后中，可以重新构造整条链，
 impl BlockchainIterator {
     pub fn new(tip_hash: String, db: Db) -> BlockchainIterator {
         todo!()
