@@ -67,6 +67,8 @@ impl ProofOfWork {
         let mut target = BigInt::from(1);
 
         // target 等于 1 左移 256 位 - TARGET_BITS 位
+        // 1 的二进制 ，256 位 255个0，然后跟上1， 0000000000000001
+        // 向左移动 256-target_bits，则刚好1到达 target_bits位，前面的都是0
         target.shl_assign(256 - TARGET_BITS);
         ProofOfWork {
             block,
@@ -99,9 +101,13 @@ impl ProofOfWork {
         println!("Mining the block");
 
         while nonce < MAX_NONCE {
+            // 1. 准备数据
             let data = self.prepare_data(nonce);
+            // 2. 用 SHA-256 对数据进行哈希
             let hash = sha256_digest(data.as_slice());
+            // 3. 将哈希转换成一个大整数
             let hash_int = BigInt::from_bytes_be(Sign::Plus, hash.as_slice());
+            // 4. 将这个大整数与目标进行比较
 
             // 1. 在比特币中，当一个块被挖出来以后， target bits 代表了区块头里存储的难度，也就是开头有多少个 0
             // 2. 这是的 20 指的是算出来的哈希前 20 必须是 0 ，如果用 16 进制表示，就是前5位必须是 0， 这一点从
