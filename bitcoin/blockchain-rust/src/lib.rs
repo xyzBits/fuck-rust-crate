@@ -8,6 +8,7 @@ mod blockchain;
 mod wallets;
 mod config;
 mod server;
+mod node;
 
 // pub 方法要通过这种方式暴露出去，其他 文件中才能使用
 pub use wallet::*;
