@@ -131,6 +131,16 @@ mod tests {
         let valid = validate_address("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert!(valid);
     }
+
+
+    #[test]
+    fn test_create_address_and_validate() {
+        let address = Wallet::new().get_address();
+        println!("address: {}", address);
+
+        let valid = validate_address(&address);
+        println!("valid: {}", valid);
+    }
 }
 
 

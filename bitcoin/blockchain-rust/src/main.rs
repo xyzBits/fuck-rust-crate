@@ -83,7 +83,7 @@ fn main() {
 
         Command::StartNode { miner} => {
             if let Some(addr) = miner {
-                if validate_address(addr.as_str()) == false {
+                if validate_address(&addr) == false {
                     panic!("Wrong miner address")
                 }
 
@@ -95,10 +95,9 @@ fn main() {
 
             let blockchain = Blockchain::new_blockchain();
             let socket_addr = GLOBAL_CONFIG.get_node_addr();
-            Server::new(blockchain).run(socket_addr.as_str());
+            Server::new(blockchain).run(&socket_addr);
         }
     }
-    println!("Hello, world!");
 }
 
 
