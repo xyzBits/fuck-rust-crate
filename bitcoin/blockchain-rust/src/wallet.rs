@@ -96,6 +96,7 @@ fn checksum(payload: &[u8]) -> Vec<u8> {
 
 
 /// 验证地址有效
+/// 根据地址的字节结构校验地址
 pub fn validate_address(address: &str) -> bool {
     let payload = base58_decode(address);
 
