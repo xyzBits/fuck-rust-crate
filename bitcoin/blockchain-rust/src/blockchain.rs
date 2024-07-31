@@ -4,16 +4,22 @@ use std::sync::{Arc, RwLock};
 
 use sled::{Db, Tree};
 use sled::transaction::TransactionResult;
+
 use crate::block::Block;
 use crate::transaction::{Transaction, TXOutput};
 
 const TIP_BLOCK_HASH_KEY: &str = "tip_block_hash";
 const BLOCKS_TREE: &str = "blocks";
 
+/// 在比特币网络中，创世区块在2009年由中本聪创建 satoshi ，并且从那时起就固定在比特币区块链的开始处
+const GENESIS_COINBASE_DATA: &str =
+    "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
 
 #[derive(Clone)]
 pub struct Blockchain {
+    // 存放 lastHash 即最后一个区块的哈希
     tip_hash: Arc<RwLock<String>>, // hash of last block
+    // 区块链 DB 中的每一个区块都是通过其哈希索引的，同时 db 上还有一个特殊的 key last 用来存储最后一个区块的哈希
     db: Db,
 
 }
@@ -182,7 +188,15 @@ impl BlockchainIterator {
 }
 
 
+#[cfg(test)]
+mod tests {
+    use crate::Blockchain;
 
+    #[test]
+    fn test_create_blockchain() {
+        let blockchain = Blockchain::create_blockchain("16hMha5ouimTKVyQKniBjctGHSedPxPwdL");
+    }
+}
 
 
 
