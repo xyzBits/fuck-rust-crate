@@ -12,7 +12,7 @@ use crate::transaction::Transaction;
 
 #[allow(non_snake_case)]
 #[allow(unused)]
-//! Block implement of blockchain
+// Block implement of blockchain
 const TARGET_HEXS: usize = 4;
 
 
@@ -76,7 +76,6 @@ impl Block {
 
     /// NewGenesisBlock creates and returns genesis Block
     pub fn new_genesis_block(coinbase: Transaction) -> Block {
-
         Block::new_block(
             vec![coinbase],
             String::new(),
@@ -109,12 +108,57 @@ impl Block {
         todo!()
     }
 
+    /// 将 {上一个区块 hash. 挖到符合条件的 nonce ，时间戳， 交易数据} 等结构化数据序列化成字节流 Vec<u8> 返回
+    /// 这一步是为了将目前的 Block 的数据整体做 hash () ，作为未来下一个区块中的 previous block hash 字段的内容
     fn prepare_hash_data(&self) -> Result<Vec<u8>> {
-        todo!()
+        let content = (
+            self.prev_block_hash.clone(),
+            self.hash_transactions()?,
+            self.timestamp,
+            TARGET_HEXS,
+            self.nonce
+        );
+
+        let bytes = bincode::serialize(&content)?;
+        Ok(bytes)
     }
 
 
+    /// Validate validates block's POW
+    /// 本 Block 的 nonce 不断变化，不断调用该函验证该 nonce 是否能够让 哈希值满足某种条件
+    /// hash 完成后 target hexs 位为 0
     fn validate(&self) -> Result<bool> {
-        todo!()
+        let data = self.prepare_hash_data();
+        let mut hasher = Sha256::new();
+        hasher.input(&data[..]);
+        let mut vec1 = Vec::new();
+        vec1.resize(TARGET_HEXS, '0' as u8);
+
+        // 比较哈希值的前 target hexs 位和合零向量是否相待，如果相等，证明 nonce 有效
+        Ok(&hasher.result_str()[0..TARGET_HEXS] == String::from_utf8(vec1)?)
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_serialize() {
+        let message = "hello wold".to_string();
+        let data = [0u8; 8];
+        let number = 45;
+
+        let content = (message, data, number);
+        let bytes = bincode::serialize(&content).unwrap();
+
+        let mut input = vec![];
+        // input
+        //     .extend(message.as_bytes())
+        //     .extend(&data)
+        //     .extend(number.to_be_bytes());
+        //
+        // let output = bincode::serialize(input).unwrap();
+        //
+        // assert_eq!(bytes, output);
     }
 }
