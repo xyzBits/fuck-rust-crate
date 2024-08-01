@@ -128,10 +128,12 @@ impl Block {
     /// 本 Block 的 nonce 不断变化，不断调用该函验证该 nonce 是否能够让 哈希值满足某种条件
     /// hash 完成后 target hexs 位为 0
     fn validate(&self) -> Result<bool> {
-        let data = self.prepare_hash_data();
+        let data = self.prepare_hash_data()?;
         let mut hasher = Sha256::new();
         hasher.input(&data[..]);
         let mut vec1 = Vec::new();
+        // [48, 48, 48, 48] 48 是 '0' utf-8 的编码结果，
+        // hash 完后 target-hexs 位为0
         vec1.resize(TARGET_HEXS, '0' as u8);
 
         // 比较哈希值的前 target hexs 位和合零向量是否相待，如果相等，证明 nonce 有效
@@ -142,6 +144,8 @@ impl Block {
 
 #[cfg(test)]
 mod tests {
+    use crate::block::TARGET_HEXS;
+
     #[test]
     fn test_serialize() {
         let message = "hello wold".to_string();
@@ -151,7 +155,7 @@ mod tests {
         let content = (message, data, number);
         let bytes = bincode::serialize(&content).unwrap();
 
-        let mut input = vec![];
+        // let mut input = vec![];
         // input
         //     .extend(message.as_bytes())
         //     .extend(&data)
@@ -160,5 +164,13 @@ mod tests {
         // let output = bincode::serialize(input).unwrap();
         //
         // assert_eq!(bytes, output);
+    }
+
+    #[test]
+    fn test_validate() {
+        let mut data = Vec::new();
+        data.resize(TARGET_HEXS, '0' as u8);
+        println!("{}", '0' as u8);
+        println!("{:?}", data);
     }
 }
