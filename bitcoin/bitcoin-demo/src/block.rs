@@ -5,6 +5,8 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use env_logger::fmt::Color::{Black, White};
 use log::info;
+use merkle_cbt::CBMT;
+use merkle_cbt::merkle_tree::Merge;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
@@ -104,8 +106,17 @@ impl Block {
         Ok(())
     }
 
+    /// HashTransactions returns a hash of the transactions in the block
+    /// 将区块中的所有交易哈希化，然后用 Merkle 树组合这些哈希，得到一个树根，这个树根是对区块中所有交易的一个摘要
     fn hash_transactions(&self) -> Result<Vec<u8>> {
-        todo!()
+        let mut transactions = Vec::new();
+        for tx in &self.transactions {
+            transactions.push(tx.hash()?.as_bytes().to_owned());
+        }
+
+        let tree = CBMT::<Vec<u8>, MergeVu8>::build_merkle_tree(&transactions);
+
+        Ok(tree.root())
     }
 
     /// 将 {上一个区块 hash. 挖到符合条件的 nonce ，时间戳， 交易数据} 等结构化数据序列化成字节流 Vec<u8> 返回
@@ -141,9 +152,32 @@ impl Block {
     }
 }
 
+/// 只是一个实现特定功能的载体
+struct MergeVu8 {}
+
+/// 接收两个 Vec<u8> 类型的引用，将它们合并后，用 SHA256 生成 hash value
+impl Merge for MergeVu8 {
+    type Item = Vec<u8>; // 在本实现中，我们处理的数据类型是 Vec<u8>
+
+    fn merge(left: &Self::Item, right: &Self::Item) -> Self::Item {
+        let mut re = [0u8; 32];
+
+        let mut hasher = Sha256::new();
+        let mut data = left.clone();
+        data.append(&mut right.clone());
+
+        hasher.input(&data);
+        hasher.result(&mut re); // 将 hash 结果吐到 re 中
+
+        re.to_vec() //
+    }
+}
 
 #[cfg(test)]
 mod tests {
+    use crypto::digest::Digest;
+    use crypto::sha2::Sha256;
+
     use crate::block::TARGET_HEXS;
 
     #[test]
@@ -172,5 +206,15 @@ mod tests {
         data.resize(TARGET_HEXS, '0' as u8);
         println!("{}", '0' as u8);
         println!("{:?}", data);
+    }
+
+
+    #[test]
+    fn test_sha256() {
+        let message = "hello world";
+        let mut hasher = Sha256::new();
+        hasher.input(message.as_bytes());
+        let hash = hasher.result_str();
+        println!("{}", hash);
     }
 }
