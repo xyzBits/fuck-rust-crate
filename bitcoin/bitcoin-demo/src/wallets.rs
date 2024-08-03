@@ -17,9 +17,7 @@ use crate::errors::Result;
 pub struct Wallet {
     pub secret_key: Vec<u8>,
     pub public_key: Vec<u8>,
-
 }
-
 
 impl Wallet {
     /// 首先生成一个随机的 32 字节的密钥，也就是256位，
@@ -48,7 +46,7 @@ impl Wallet {
         hash_pub_key(&mut pub_hash);
         let address = Address {
             body: pub_hash,
-            scheme: Scheme::Base58, // 使用 base 58 编码方案
+            scheme: Scheme::Base58,      // 使用 base 58 编码方案
             hash_type: HashType::Script, // 该地址对应的是一个脚本而非单一的公钥
             ..Default::default()
         }; // 这个结构体用于表示一个比特币地址
@@ -71,11 +69,9 @@ pub fn hash_pub_key(pub_key: &mut Vec<u8>) {
     hasher2.result(pub_key);
 }
 
-
 pub struct Wallets {
     wallets: HashMap<String, Wallet>,
 }
-
 
 impl Wallets {
     /// NewWallets creates Wallets and fills it from a file if it exists
@@ -100,7 +96,6 @@ impl Wallets {
         Ok(wlt)
     }
 
-
     /// CreateWallet adds a wallet to Wallets
     pub fn create_wallet(&mut self) -> String {
         let wallet = Wallet::new();
@@ -109,7 +104,6 @@ impl Wallets {
         info!("create wallet: {}", address);
         address
     }
-
 
     /// GetAddresses returns an array of addresses stored in the wallet file
     pub fn get_all_addresses(&self) -> Vec<String> {
@@ -126,7 +120,6 @@ impl Wallets {
         self.wallets.get(address)
     }
 
-
     pub fn save_all(&self) -> Result<()> {
         let db = sled::open("data/wallets")?;
 
@@ -142,11 +135,63 @@ impl Wallets {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use bitcoincash_addr::Address;
+    use crypto::ed25519;
+
+    use crate::wallets::{hash_pub_key, Wallet, Wallets};
+
+    #[test]
+    fn test_create_wallet_and_hash() {
+        let w1 = Wallet::new();
+        let w2 = Wallet::new();
+        assert_ne!(w1, w2);
+        assert_ne!(w1.get_address(), w2.get_address());
+
+        let mut p2 = w2.public_key.clone();
+        hash_pub_key(&mut p2);
+        assert_eq!(p2.len(), 20);
+
+        // 可以从 address 中解出 pub key 的 hash
+        let pub_key_hash = Address::decode(&w2.get_address()).unwrap().body;
+        assert_eq!(pub_key_hash, p2);
+    }
+
+    #[test]
+    fn test_wallets() {
+        let mut wallets = Wallets::new().unwrap();
+        let address = wallets.create_wallet();
+
+        let wallet = wallets.get_wallet(&address).unwrap();
+
+        wallets.save_all().unwrap();
+
+        let wallets = Wallets::new().unwrap();
+        let existed_wallet = wallets.get_wallet(&address).unwrap();
+        assert_eq!(wallet, existed_wallet);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_wallets_not_exist() {
+        let wallet = Wallet::new();
+        let wallets = Wallets::new().unwrap();
+        wallets.get_wallet(&wallet.get_address()).unwrap();
+    }
 
 
+    #[test]
+    fn test_signature() {
+        let wallet = Wallet::new();
+        let signature = ed25519::signature(
+            "test".as_bytes(),
+            &wallet.secret_key);
 
-
-
-
-
-
+        assert!(ed25519::verify(
+            "test".as_bytes(),
+            &wallet.public_key,
+            &signature,
+        ));
+    }
+}

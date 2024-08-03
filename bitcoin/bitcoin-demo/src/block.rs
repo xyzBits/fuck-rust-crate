@@ -5,8 +5,8 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use env_logger::fmt::Color::{Black, White};
 use log::info;
-use merkle_cbt::CBMT;
 use merkle_cbt::merkle_tree::Merge;
+use merkle_cbt::CBMT;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
@@ -16,7 +16,6 @@ use crate::transaction::Transaction;
 #[allow(unused)]
 // Block implement of blockchain
 const TARGET_HEXS: usize = 4;
-
 
 // Block keeps block headers
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -61,15 +60,14 @@ impl Block {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_millis();
 
-        let mut block =
-            Block {
-                timestamp,
-                transactions,
-                prev_block_hash,
-                hash: String::new(),
-                nonce: 0,
-                height,
-            };
+        let mut block = Block {
+            timestamp,
+            transactions,
+            prev_block_hash,
+            hash: String::new(),
+            nonce: 0,
+            height,
+        };
 
         block.run_proof_of_work()?; // 不断循环，直到挖到为止
 
@@ -78,11 +76,7 @@ impl Block {
 
     /// NewGenesisBlock creates and returns genesis Block
     pub fn new_genesis_block(coinbase: Transaction) -> Block {
-        Block::new_block(
-            vec![coinbase],
-            String::new(),
-            0)
-            .unwrap()
+        Block::new_block(vec![coinbase], String::new(), 0).unwrap()
     }
 
     /// Run performs a proof-of-work
@@ -127,13 +121,12 @@ impl Block {
             self.hash_transactions()?,
             self.timestamp,
             TARGET_HEXS,
-            self.nonce
+            self.nonce,
         );
 
         let bytes = bincode::serialize(&content)?;
         Ok(bytes)
     }
-
 
     /// Validate validates block's POW
     /// 本 Block 的 nonce 不断变化，不断调用该函验证该 nonce 是否能够让 哈希值满足某种条件
@@ -207,7 +200,6 @@ mod tests {
         println!("{}", '0' as u8);
         println!("{:?}", data);
     }
-
 
     #[test]
     fn test_sha256() {

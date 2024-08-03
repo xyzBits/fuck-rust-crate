@@ -1,9 +1,9 @@
-mod transaction;
 mod block;
 mod blockchain;
 mod cli;
-mod server;
 mod errors;
+mod server;
+mod transaction;
 mod utxoset;
 mod wallets;
 

@@ -1,3 +1,1 @@
-pub struct Blockchain {
-
-}
+pub struct Blockchain {}

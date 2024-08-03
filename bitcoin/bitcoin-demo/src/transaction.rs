@@ -21,7 +21,7 @@ pub struct TXInput {
 /// TXOutput represents a transaction output
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TXOutput {
-    pub value: i32, // 金额 amount
+    pub value: i32,            // 金额 amount
     pub pub_key_hash: Vec<u8>, // 标识了谁能花费这笔 TXOutput
 }
 
@@ -42,17 +42,11 @@ pub struct Transaction {
 impl Transaction {
     /// New utxo transaction creates a new transaction
     /// 它从一个给定的钱包创建一个新的 utxo 未消费的交易输出，发送指定数量的资金到指定的地址，并返回创建的交易
-    pub fn new_utxo(
-        wallet: &Wallet,
-        to: &str,
-        amount: i32,
-        utxo: &UTXOSet,
-    ) -> Result<Transaction> {
-        info!("new UTXO Transaction from: {}, to: {}",);
+    pub fn new_utxo(wallet: &Wallet, to: &str, amount: i32, utxo: &UTXOSet) -> Result<Transaction> {
+        info!("new UTXO Transaction from: {}, to: {}", 1, 2);
         todo!()
     }
 }
-
 
 impl Transaction {
     pub fn hash(&self) -> Result<String> {
