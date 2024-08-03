@@ -7,8 +7,8 @@ use crypto::ed25519;
 use crypto::ripemd160::Ripemd160;
 use crypto::sha2::Sha256;
 use log::info;
-use rand::RngCore;
 use rand::rngs::OsRng;
+use rand::RngCore;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
@@ -180,13 +180,10 @@ mod tests {
         wallets.get_wallet(&wallet.get_address()).unwrap();
     }
 
-
     #[test]
     fn test_signature() {
         let wallet = Wallet::new();
-        let signature = ed25519::signature(
-            "test".as_bytes(),
-            &wallet.secret_key);
+        let signature = ed25519::signature("test".as_bytes(), &wallet.secret_key);
 
         assert!(ed25519::verify(
             "test".as_bytes(),
