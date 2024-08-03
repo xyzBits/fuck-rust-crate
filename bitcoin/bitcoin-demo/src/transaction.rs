@@ -1,3 +1,4 @@
+use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::*;
@@ -39,12 +40,15 @@ pub struct Transaction {
 }
 
 impl Transaction {
+    /// New utxo transaction creates a new transaction
+    /// 它从一个给定的钱包创建一个新的 utxo 未消费的交易输出，发送指定数量的资金到指定的地址，并返回创建的交易
     pub fn new_utxo(
         wallet: &Wallet,
         to: &str,
         amount: i32,
         utxo: &UTXOSet,
     ) -> Result<Transaction> {
+        info!("new UTXO Transaction from: {}, to: {}",);
         todo!()
     }
 }
