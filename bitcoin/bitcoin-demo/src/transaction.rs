@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use std::slice::RSplit;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -42,12 +44,7 @@ pub struct Transaction {
 impl Transaction {
     /// New utxo transaction creates a new transaction
     /// 它从一个给定的钱包创建一个新的 utxo 未消费的交易输出，发送指定数量的资金到指定的地址，并返回创建的交易
-    pub fn new_utxo(
-        wallet: &Wallet,
-        to: &str,
-        amount: i32,
-        utxo: &UTXOSet,
-    ) -> Result<Transaction> {
+    pub fn new_utxo(wallet: &Wallet, to: &str, amount: i32, utxo: &UTXOSet) -> Result<Transaction> {
         info!("new UTXO Transaction from: {}, to: {}", 1, 2);
 
         // let mut vin = Vec::new();
@@ -65,17 +62,36 @@ impl Transaction {
         // 这三笔 TXOutput 就会用来全部花费掉以执行本次交易：
         // 转给 receiver 10 BTC，转给 msg.sender 2 BTC
 
+        todo!()
+    }
 
+    pub fn new_coinbase(to: String, mut data: String) -> Result<Transaction> {
         todo!()
     }
 
     pub fn is_coinbase(&self) -> bool {
         todo!()
     }
-}
 
-impl Transaction {
+
+    pub fn verify(&self, prev_txs: HashMap<String, Transaction>) -> Result<bool> {
+        todo!()
+    }
+
+    pub fn sign(
+        &mut self,
+        private_key: &[u8],
+        prev_txs: HashMap<String, Transaction>,
+    ) -> Result<()> {
+        todo!()
+    }
+
     pub fn hash(&self) -> Result<String> {
+        todo!()
+    }
+
+
+    fn trim_copy(&self) -> Transaction {
         todo!()
     }
 }
@@ -90,5 +106,22 @@ impl TXOutput {
     /// 那么返回 true 否则返回 false
     pub fn is_locked_with_key(&self, pub_key_hash: &[u8]) -> bool {
         self.pub_key_hash == pub_key_hash
+    }
+
+    fn lock(&mut self, address: &str) -> Result<()> {
+        todo!()
+    }
+
+    pub fn new(value: i32, address: String) -> Result<Self> {
+        todo!()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_signature() {
+
     }
 }
