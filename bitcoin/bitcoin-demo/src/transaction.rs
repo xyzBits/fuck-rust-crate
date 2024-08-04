@@ -50,7 +50,7 @@ impl Transaction {
     ) -> Result<Transaction> {
         info!("new UTXO Transaction from: {}, to: {}", 1, 2);
 
-        let mut vin = Vec::new();
+        // let mut vin = Vec::new();
 
         // 复制钱包的公钥后，创建公钥的哈希
         let mut pub_key_hash = wallet.public_key.clone();
@@ -73,5 +73,18 @@ impl Transaction {
 impl Transaction {
     pub fn hash(&self) -> Result<String> {
         todo!()
+    }
+}
+
+
+impl TXOutput {
+    /// 定义 TXOutput 交易输出的方法
+    /// 在区块链交易中， 锁定交易输出实际上就是将交易输出与一个特定的公钥哈希（也就是地址）相关联
+    /// 这个步骤只是确保了只拥有相应私钥的用户才能在将来的交易中使用这个输出
+    ///
+    /// 检查当前输出是否被给定的公钥哈希锁定，如果当前输出的公钥哈希与给定的公钥哈希相等，
+    /// 那么返回 true 否则返回 false
+    pub fn is_locked_with_key(&self, pub_key_hash: &[u8]) -> bool {
+        self.pub_key_hash == pub_key_hash
     }
 }
