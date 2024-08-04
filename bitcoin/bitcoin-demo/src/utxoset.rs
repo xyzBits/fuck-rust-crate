@@ -7,7 +7,7 @@ use std::collections::HashMap;
 /// UTXOSet represents UTXO set
 /// 设计 UTXO 的意义，使代码的语意更加明确，提高代码的模块化，并可能提供一些特定于 UTXO 集的操作和数据
 pub struct UTXOSet {
-    blockchain: Blockchain,
+    pub blockchain: Blockchain,
 }
 
 impl UTXOSet {
