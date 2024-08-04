@@ -68,6 +68,10 @@ impl Transaction {
 
         todo!()
     }
+
+    pub fn is_coinbase(&self) -> bool {
+        todo!()
+    }
 }
 
 impl Transaction {

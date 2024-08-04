@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use crate::block::Block;
 use crate::blockchain::Blockchain;
 use crate::errors::Result;
 use crate::transaction::TXOutputs;
@@ -49,5 +50,100 @@ impl UTXOSet {
 
 
         Ok((accumulated, unspent_outputs))
+    }
+
+    /// 找到所有被指定公钥哈希锁定的未花费交易输出，这些输出代表了 pub key hash 这个地址的余额
+    ///
+    pub fn find_utxo(&self, pub_key_hash: &[u8]) -> Result<TXOutputs> {
+        let mut utxos = TXOutputs {
+            outputs: Vec::new(),
+        };
+
+        let db = sled::open("data/utxos")?;
+
+        for kv in db.iter() {
+            let (_, v) = kv?;
+            let outs: TXOutputs = bincode::deserialize(&v.to_vec())?;
+
+            for out in outs.outputs {
+                if out.is_locked_with_key(pub_key_hash) {
+                    utxos.outputs.push(out.clone());
+                }
+            }
+        }
+
+        Ok(utxos)
+    }
+
+    /// 返回数据库中存储的所有地址的所有未花费交易输出的数量
+    pub fn count_transactions(&self) -> Result<i32> {
+        let mut counter = 0;
+
+        let db = sled::open("data/utxos")?;
+
+        for kv in db.iter() {
+            kv?;
+            counter += 1;
+        }
+
+        Ok(counter)
+    }
+
+
+    /// 重建 utxo 集合，它首先删除数据库中的所有数据，然后通过查找区块链中的所有未花费交易输出来重新填充数据库
+    pub fn reindex(&self) -> Result<()> {
+        std::fs::remove_dir("data/utxos").ok();
+
+        let db = sled::open("data/utxos")?;
+
+        let utxos = self.blockchain.find_utxo();
+
+        for (txid, outs) in utxos {
+            db.insert(txid.as_bytes(), bincode::serialize(&outs)?)?;
+        }
+
+        Ok(())
+    }
+    
+    /// 此方法会用区块中的交易来更新 utxo 集合，对于每个交易，它会从数据库中移除已经被花费的输出
+    /// 并添加新的未花费输出
+    pub fn update(&self, block: &Block) -> Result<()> {
+        let db = sled::open("data/utxos")?;
+
+        for tx in block.get_transaction() {
+            if !tx.is_coinbase() {
+                for vin in &tx.vin {
+                    let mut update_outputs = TXOutputs {
+                        outputs: Vec::new(),
+                    };
+
+                    let outs: TXOutputs = bincode::deserialize(&db.get(&vin.txid)?.unwrap().to_vec())?;
+                    for out_idx in 0..outs.outputs.len() {
+                        if out_idx != vin.vout as usize {
+                            update_outputs.outputs.push(outs.outputs[out_idx].clone());
+                        }
+                    }
+
+                    if update_outputs.outputs.is_empty() {
+                        db.remove(&vin.txid)?;
+                    } else {
+                        db.insert(vin.txid.as_bytes(), bincode::serialize(&update_outputs)?)?;
+                    }
+
+                }
+            }
+
+            let mut new_outputs = TXOutputs {
+                outputs: Vec::new(),
+            };
+
+            for out in &tx.vout {
+                new_outputs.outputs.push(out.clone());
+            }
+
+            db.insert(tx.id.as_bytes(), bincode::serialize(&new_outputs)?)?;
+        }
+
+        Ok(())
     }
 }
