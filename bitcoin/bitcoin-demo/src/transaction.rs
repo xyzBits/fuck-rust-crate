@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use std::slice::RSplit;
 use log::info;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::slice::RSplit;
 
 use crate::errors::*;
 use crate::utxoset::UTXOSet;
@@ -73,7 +73,6 @@ impl Transaction {
         todo!()
     }
 
-
     pub fn verify(&self, prev_txs: HashMap<String, Transaction>) -> Result<bool> {
         todo!()
     }
@@ -90,12 +89,10 @@ impl Transaction {
         todo!()
     }
 
-
     fn trim_copy(&self) -> Transaction {
         todo!()
     }
 }
-
 
 impl TXOutput {
     /// 定义 TXOutput 交易输出的方法
@@ -117,11 +114,8 @@ impl TXOutput {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]
-    fn test_signature() {
-
-    }
+    fn test_signature() {}
 }
