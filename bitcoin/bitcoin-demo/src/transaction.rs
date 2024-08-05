@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 use std::slice::RSplit;
 
+use crypto::ed25519;
 use failure::format_err;
 use log::{error, info};
-use rand::rngs::OsRng;
 use rand::RngCore;
+use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::*;
@@ -166,7 +167,25 @@ impl Transaction {
         // 创建当前交易的一个修剪版副本，它移除了输入签名和公钥，以便我们可以重新计算它的哈希值
         let mut tx_copy = self.trim_copy();
 
-        for in_id in 0..self.vin.len() {}
+        for in_id in 0..self.vin.len() {
+            // 找到该输入对应的先前的交易
+            let prev_tx = prev_txs.get(&self.vin[in_id].txid).unwrap();
+            tx_copy.vin[in_id].signature.clear();
+            tx_copy.vin[in_id].pub_key = prev_tx.vout[self.vin[in_id].vout as usize]
+                .pub_key_hash
+                .clone();
+
+            tx_copy.id = tx_copy.hash()?;
+            tx_copy.vin[in_id].pub_key = Vec::new();
+
+            if !ed25519::verify(
+                &tx_copy.id.as_bytes(),
+                &self.vin[in_id].pub_key,
+                &self.vin[in_id].signature,
+            ) {
+                return Ok(false);
+            }
+        }
 
         Ok(true)
     }
