@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::slice::RSplit;
-
+use bitcoincash_addr::Address;
 use crypto::digest::Digest;
 use crypto::ed25519;
 use crypto::sha2::Sha256;
 use failure::format_err;
-use log::{error, info};
+use log::{debug, error, info};
 use rand::rngs::OsRng;
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
@@ -276,16 +276,46 @@ impl TXOutput {
     }
 
     fn lock(&mut self, address: &str) -> Result<()> {
-        todo!()
+        let pub_key_hash = Address::decode(address).unwrap().body;
+        debug!("lock: {}", address);
+        self.pub_key_hash = pub_key_hash;
+        Ok(())
     }
 
     pub fn new(value: i32, address: String) -> Result<Self> {
-        todo!()
+        let mut tx_output = TXOutput {
+            value,
+            pub_key_hash: Vec::new(),
+        };
+
+        tx_output.lock(&address)?;
+        Ok(tx_output)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crypto::ed25519;
+    use crate::transaction::Transaction;
+    use crate::wallets::Wallets;
+
     #[test]
-    fn test_signature() {}
+    fn test_signature() {
+        let mut wallets = Wallets::new().unwrap();
+        let wallet = wallets.create_wallet();
+        let wallet_copy = wallets.get_wallet(&wallet).unwrap().clone();
+        wallets.save_all().unwrap();
+
+        drop(wallets);
+
+        let data = String::from("hello world");
+        let transaction = Transaction::new_coinbase(wallet, data).unwrap();
+        assert!(transaction.is_coinbase());
+
+        let signature = ed25519::signature(transaction.id.as_bytes(), &wallet_copy.secret_key);
+        assert!(
+            ed25519::verify(transaction.id.as_bytes(),
+            &wallet_copy.public_key, &signature)
+        )
+    }
 }
