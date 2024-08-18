@@ -1,5 +1,4 @@
 .idea
 Cargo.lock
 target
-wallet.dat
-data
+pkg

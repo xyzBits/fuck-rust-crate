@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+</head>
+<body>
+    <input type="number" id="num1" placeholder="Enter first number">
+    <input type="number" id="num2" placeholder="Enter second number">
+    <button id="add">Add</button>
+    <button id="subtract">Subtract</button>
+    <button id="multiply">Multiply</button>
+    <button id="divide">Divide</button>
+    <p id="result"></p>
+
+    <script type="module">
+        import init, { add, subtract, multiply, divide } from './pkg/calculator.js';
+
+        async function run() {
+            await init();
+
+            document.getElementById('add').addEventListener('click', () => {
+                const num1 = parseFloat(document.getElementById('num1').value);
+                const num2 = parseFloat(document.getElementById('num2').value);
+                document.getElementById('result').innerText = `Result: ${add(num1, num2)}`;
+            });
+
+            document.getElementById('subtract').addEventListener('click', () => {
+                const num1 = parseFloat(document.getElementById('num1').value);
+                const num2 = parseFloat(document.getElementById('num2').value);
+                document.getElementById('result').innerText = `Result: ${subtract(num1, num2)}`;
+            });
+
+            document.getElementById('multiply').addEventListener('click', () => {
+                const num1 = parseFloat(document.getElementById('num1').value);
+                const num2 = parseFloat(document.getElementById('num2').value);
+                document.getElementById('result').innerText = `Result: ${multiply(num1, num2)}`;
+            });
+
+            document.getElementById('divide').addEventListener('click', () => {
+                const num1 = parseFloat(document.getElementById('num1').value);
+                const num2 = parseFloat(document.getElementById('num2').value);
+                document.getElementById('result').innerText = `Result: ${divide(num1, num2)}`;
+            });
+        }
+
+        run();
+    </script>
+</body>
+</html>

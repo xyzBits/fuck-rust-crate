@@ -1,6 +1,7 @@
 use log::LevelFilter;
 use structopt::StructOpt;
-use blockchain_rust::{Blockchain, GLOBAL_CONFIG, Server, validate_address};
+
+use blockchain_rust::{Blockchain, GLOBAL_CONFIG, Server, UTXOSet, validate_address, Wallets};
 
 /// mine 标志是指块立即会被同一节点挖出来 ，必须要有这个标志，因为初始状态时，网络中没有矿工节点
 const MINE_TRUE: usize = 1;
@@ -60,16 +61,24 @@ enum Command {
     },
 }
 fn main() {
-
     env_logger::builder().filter_level(LevelFilter::Info).init();
 
     let opt = Opt::from_args();
 
 
     match opt.command {
-        Command::CreateBlockchain { .. } => {}
+        Command::CreateBlockchain { address } => {
+            let blockchain = Blockchain::create_blockchain(&address);
+            let utxo_set = UTXOSet::new(blockchain);
+            utxo_set.reindex();
+            println!("Done!");
+        }
 
-        Command::CreateWallet => {}
+        Command::CreateWallet => {
+            let mut wallets = Wallets::new();
+            let address = wallets.create_wallet();
+            println!("Your new address: {}", address);
+        }
 
         Command::GetBalance { .. } => {}
 
@@ -81,24 +90,22 @@ fn main() {
 
         Command::ReindexUtxo => {}
 
-        Command::StartNode { miner} => {
+        Command::StartNode { miner } => {
             if let Some(addr) = miner {
-                if validate_address(addr.as_str()) == false {
+                if validate_address(&addr) == false {
                     panic!("Wrong miner address")
                 }
 
                 println!("Mining is on. Address to receive rewards: {}", addr);
 
                 GLOBAL_CONFIG.set_mining_addr(addr);
-
             }
 
             let blockchain = Blockchain::new_blockchain();
             let socket_addr = GLOBAL_CONFIG.get_node_addr();
-            Server::new(blockchain).run(socket_addr.as_str());
+            Server::new(blockchain).run(&socket_addr);
         }
     }
-    println!("Hello, world!");
 }
 
 

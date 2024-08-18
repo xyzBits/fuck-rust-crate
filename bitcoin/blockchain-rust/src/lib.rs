@@ -9,9 +9,12 @@ mod wallets;
 mod config;
 mod server;
 mod node;
+mod memory_pool;
 
 // pub 方法要通过这种方式暴露出去，其他 文件中才能使用
 pub use wallet::*;
 pub use config::*;
 pub use blockchain::*;
 pub use server::*;
+pub use utxo_set::*;
+pub use wallets::*;

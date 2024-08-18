@@ -1,45 +1,49 @@
+use std::pin::Pin;
+
 use actix::{Actor, Context, Handler, Message, System};
 
 
 
-struct Ping(usize);
+struct Ping;
 
 impl Message for Ping {
-    type Result = usize;
-    
+    // define return type
+    type Result = Result<bool, std::io::Error>;
 }
 
+// Define actor
 struct MyActor {
-    count: usize,
+
 }
 
+// Provide Actor implement for our actor 
 impl Actor for MyActor {
     type Context = Context<Self>;
+
     
-}
-
-impl Handler<Ping> for MyActor {
-    type Result = usize;
-
-    fn handle(&mut self, msg: Ping, ctx: &mut Self::Context) -> Self::Result {
-        self.count += msg.0;
-        self.count
+    fn started(&mut self, ctx: &mut Self::Context) {
+        println!("Actor is alive");
     }
     
+    fn stopped(&mut self, ctx: &mut Self::Context) {
+        println!("Actor is stopped");
+    }
 }
+
+// Define handler for Ping message 
+impl Handler<Ping> for MyActor {
+    type Result = Result<bool, std::io::Error>;
+    fn handle(&mut self, msg: Ping, ctx: &mut Self::Context) -> Self::Result {
+        println!("Ping received");
+
+        Ok(true)
+    }
+}
+
 
 
 #[actix::main]
 async fn main() {
+    let addr = MyActor.start();
 
-    let addr = MyActor {count: 10}.start();
-
-    let res = addr.send(Ping(10)).await;
-
-    println!("RESULT: {}", res.unwrap() == 20);
-
-
-    println!("Hello, world!");
-
-    System::current().stop();
 }

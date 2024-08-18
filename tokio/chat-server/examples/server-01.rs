@@ -3,7 +3,7 @@ use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let server = TcpListener::bind("127.0.0.1:42069").await?;
+    let server = TcpListener::bind("127.0.0.1:42068").await?;
 
     let (mut tcp, _) = server.accept().await?;
 

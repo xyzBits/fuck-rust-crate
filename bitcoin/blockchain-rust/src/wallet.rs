@@ -36,10 +36,23 @@ impl Wallet {
     /// 这就是为什么选择一个合适的公钥加密算法是如此重要：
     /// 考虑到私钥是随机数，生成同一个数字的概率必须是尽可能地低，理想情况下，必须是低到永远不会重复
     /// 另外，你并不需要连接到一个比特币节点来获得一个地址，地址生成算法使用的多种开源算法可以通过很多编程语言和库实现
+    ///
+    ///
+    /// 将一个公钥转换成一个 Base58 地址需要以下步骤：
+    ///
+    /// 1. 使用 RIPEMD160(SHA256(PubKey)) 哈希算法，取公钥并对其哈希两次
+    ///
+    /// 2. 给哈希加上地址生成算法版本的前缀
+    ///
+    /// 3. 对于第二步生成的结果，使用 SHA256(SHA256(payload)) 再哈希，计算校验和。校验和是结果哈希的前四个字节。
+    ///
+    /// 4. 将校验和附加到 version+PubKeyHash 的组合中。
+    ///
+    /// 5. 使用 Base58 对 version+PubKeyHash+checksum 组合进行编码。
     pub fn get_address(&self) -> String {
 
         // 1. 计算公钥的 SHA-256 哈希，然后使用 Ripemd-160 哈希
-        let pub_key_hash = hash_pub_key(self.public_key.as_slice());
+        let pub_key_hash = hash_pub_key(&self.public_key);
 
         let mut payload = vec![];
 
@@ -47,7 +60,7 @@ impl Wallet {
         payload.push(VERSION);
         payload.extend(pub_key_hash);
 
-        // 3. 计算校验和，是为了防止地址在传输过程中的误输入，
+        // 3. 计算校验和，是为了防止地址在传输过程中的误输入，校验和 = SHA256(SHA256(payload))
         let checksum = checksum(&payload);
 
         payload.extend(&checksum);
@@ -83,6 +96,7 @@ fn checksum(payload: &[u8]) -> Vec<u8> {
 
 
 /// 验证地址有效
+/// 根据地址的字节结构校验地址
 pub fn validate_address(address: &str) -> bool {
     let payload = base58_decode(address);
 
@@ -117,6 +131,7 @@ pub fn convert_address(pub_hash_key: &[u8]) -> String {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::{ecdsa_p256_sha256_sign_digest, ecdsa_p256_sha256_sign_verify};
     use crate::wallet::{validate_address, Wallet};
 
     #[test]
@@ -130,6 +145,32 @@ mod tests {
         // BTC 创世块：1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
         let valid = validate_address("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert!(valid);
+    }
+
+
+    #[test]
+    fn test_create_address_and_validate() {
+        let address = Wallet::new().get_address();
+        println!("address: {}", address);
+
+        let valid = validate_address(&address);
+        println!("valid: {}", valid);
+    }
+
+
+    #[test]
+    fn test_sign_and_verify() {
+        let wallet = Wallet::new();
+        let secret_key = wallet.pkcs8;
+        let public_key = wallet.public_key;
+
+        let message = b"hello world";
+        let signature = ecdsa_p256_sha256_sign_digest(&secret_key, message);
+
+        let verified = ecdsa_p256_sha256_sign_verify(&public_key, &signature, message);
+
+        println!("{}", verified);
+
     }
 }
 
