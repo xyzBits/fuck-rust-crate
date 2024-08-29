@@ -4,17 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+# 生成 client server
 tonic = "0.11"
-prost = "0.12"
+
+# 将 protobuf 编译成 rust 的 struct 
+prost = {version =  "0.12", features = []}
 tokio = {version = "1.0", features = ["macros", "rt-multi-thread"]}
 
 [build-dependencies]
+# 内部调用 prost tonic 生成 rust struct ，以及 server client
 tonic-build = "0.11"
 
-[[bin]]
-name = "server"
-path = "src/server.rs"
 
-[[bin]]
-name = "client"
-path = "src/client.rs"

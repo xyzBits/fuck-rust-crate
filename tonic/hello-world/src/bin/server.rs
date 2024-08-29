@@ -1,18 +1,19 @@
-use tonic::{Request, Response, Status};
-use tonic::transport::Server;
 use hello_world::greeter_server::{Greeter, GreeterServer};
-use crate::hello_world::{HelloRequest, HelloResponse};
+use hello_world::{HelloRequest, HelloResponse};
+use tonic::transport::Server;
+use tonic::{Request, Response, Status};
 
-pub mod hello_world {
-    tonic::include_proto!("hello_world");
-}
-
+// 定义一个结构体，里面可以有数据库或者其他的连接
 #[derive(Default)]
 pub struct MyGreeter {}
 
+// 为结构体实现 Greeter trait
 #[tonic::async_trait]
 impl Greeter for MyGreeter {
-    async fn say_hello(&self, request: Request<HelloRequest>) -> Result<Response<HelloResponse>, Status> {
+    async fn say_hello(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<HelloResponse>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
 
         let response = hello_world::HelloResponse {
@@ -21,11 +22,10 @@ impl Greeter for MyGreeter {
 
         Ok(Response::new(response))
     }
-
 }
 
 #[tokio::main]
-async fn  main() -> Result<(), Box<dyn  std::error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "[::1]:50051".parse().unwrap();
     let greeter = MyGreeter::default();
 

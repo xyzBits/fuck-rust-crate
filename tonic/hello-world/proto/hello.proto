@@ -1,7 +1,8 @@
 syntax = "proto3";
-package hello_world;
 
+package hello;
 
+// 消息相关的定义，由 prost 转成 rust 相关的 struct
 message HelloRequest {
   string name = 1;
 }

@@ -1,9 +1,6 @@
-use crate::hello_world::greeter_client::GreeterClient;
-use crate::hello_world::HelloRequest;
-
-pub mod hello_world {
-    tonic::include_proto!("hello_world");
-}
+// 为什么这里是 hello_world 因为这个lib 的名字就是 hello_world
+use hello_world::greeter_client::GreeterClient;
+use hello_world::HelloRequest;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -15,7 +12,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client.say_hello(request).await?;
 
-
-    println!("response={:?}", response);
+    println!("response={:?}", response.into_inner());
     Ok(())
 }
