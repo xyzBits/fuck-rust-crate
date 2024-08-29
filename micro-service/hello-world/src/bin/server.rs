@@ -32,8 +32,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("GreeterServer listening on {}", addr);
 
     Server::builder()
+        // 加服务，也就是业务逻辑的实现
         .add_service(GreeterServer::new(greeter))
         .serve(addr)
+        // await 会一直阻塞在这里
         .await?;
 
     Ok(())

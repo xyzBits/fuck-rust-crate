@@ -2,6 +2,7 @@
 use hello_world::greeter_client::GreeterClient;
 use hello_world::HelloRequest;
 
+// client 也运行在异步的运行时上
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = GreeterClient::connect("http://[::1]:50051").await?;
@@ -12,6 +13,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client.say_hello(request).await?;
 
-    println!("response={:?}", response.into_inner());
+    println!("response={:?}", response);
     Ok(())
 }
