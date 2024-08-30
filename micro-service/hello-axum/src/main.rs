@@ -10,7 +10,9 @@ fn main() {
     // 阻塞到异步的任务一直完成，这是一个常驻的服务
     runtime.block_on(async move {
         // 一个请求分好几个
-        let app = Router::new().route("/", get(root));
+        let app = Router::new()
+            // route 就是注册一个方法
+            .route("/", get(root));
 
         let addr = SocketAddr::from_str("127.0.0.1:3000").unwrap();
 
