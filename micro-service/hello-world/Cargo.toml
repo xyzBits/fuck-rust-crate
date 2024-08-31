@@ -11,6 +11,9 @@ tonic = "0.11"
 prost = {version =  "0.12", features = []}
 tokio = {version = "1.0", features = ["macros", "rt-multi-thread"]}
 
+opentelemetry = "0.16"
+opentelemetry-jaeger = "0.15"
+
 [build-dependencies]
 # 内部调用 prost tonic 生成 rust struct ，以及 server client
 tonic-build = "0.11"

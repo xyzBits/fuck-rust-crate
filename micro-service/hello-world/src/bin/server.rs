@@ -1,5 +1,9 @@
 use hello_world::greeter_server::{Greeter, GreeterServer};
 use hello_world::{HelloRequest, HelloResponse};
+use opentelemetry::global;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::trace::{TraceError, Tracer};
+use tonic::metadata::MetadataMap;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
@@ -12,8 +16,15 @@ pub struct MyGreeter {}
 impl Greeter for MyGreeter {
     async fn say_hello(
         &self,
-        request: Request<HelloRequest>,
+        mut request: Request<HelloRequest>,
     ) -> Result<Response<HelloResponse>, Status> {
+        let parent_cx =
+            // global::get_text_map_propagator(|prop|
+            //     prop.extract(&MetadataMap {
+            //         request.get_metadata_mut()
+            //     }));
+
+
         println!("Got a request from {:?}", request.remote_addr());
 
         let response = hello_world::HelloResponse {
@@ -24,8 +35,20 @@ impl Greeter for MyGreeter {
     }
 }
 
+
+fn tracing_init() -> Result<impl Tracer, TraceError> {
+    global::set_text_map_propagator(TraceContextPropagator::new());
+    opentelemetry_jaeger::new_pipeline()
+        .with_service_name("grpc-server")
+        .install_simple()
+}
+
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_init()?;
+
+
     let addr = "[::1]:50051".parse().unwrap();
     let greeter = MyGreeter::default();
 
