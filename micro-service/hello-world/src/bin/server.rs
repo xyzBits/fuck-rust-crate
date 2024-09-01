@@ -19,10 +19,12 @@ impl Greeter for MyGreeter {
         mut request: Request<HelloRequest>,
     ) -> Result<Response<HelloResponse>, Status> {
         let parent_cx =
-            // global::get_text_map_propagator(|prop|
-            //     prop.extract(&MetadataMap {
-            //         request.get_metadata_mut()
-            //     }));
+        //     global::get_text_map_propagator(|prop|
+        //         prop.extract(&MetadataMap {
+        //             request.get_metadata_mut()
+        //         }));
+        //
+        // global::tracer("greeter").start_with_context("Processing reply");
 
 
         println!("Got a request from {:?}", request.remote_addr());
