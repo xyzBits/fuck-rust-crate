@@ -1,0 +1,10 @@
+[package]
+name = "_01_thread"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+affinity = "0.1.2"
+num_cpus = "1.16.0"
+num_threads = "0.1.7"
+thread-amount = "0.1.3"
