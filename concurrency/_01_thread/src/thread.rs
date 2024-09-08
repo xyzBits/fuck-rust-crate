@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::thread;
 use std::time::Duration;
 
@@ -162,4 +163,192 @@ fn test_process_num() {
 
     let count = num_cpus::get();
     println!("num_cpus: {}", count);
+}
+
+#[test]
+fn test_start_thread_with_sleep() {
+    // 保证当前线程 sleep 指定的时间，它为它会阻塞当前线程，所以不要在异步的代码中调用它，
+    // 如果时间设置为 0 ， unix 类平台会立即 返回，
+    // 如果只想让度出时间片，不用设置为 0，而是调用 yield_now 函数
+    let handle1 = thread::spawn(|| {
+        thread::sleep(Duration::from_millis(2_000));
+        println!("Hello from thread1!");
+    });
+
+    let handle2 = thread::spawn(move || {
+        thread::sleep(Duration::from_millis(1_000));
+        println!("Hello from thread2!");
+    });
+
+    handle1.join().unwrap();
+    handle2.join().unwrap();
+}
+
+#[test]
+fn test_start_thread_with_yield_now() {
+    let handle1 = thread::spawn(|| {
+        // 暂时的让出同 cpu 的 time slice ，后面会立即 被调度
+        thread::yield_now();
+        println!("yield from thread1");
+    });
+
+    let handle2 = thread::spawn(|| {
+        thread::yield_now();
+        println!("yield from thread2");
+    });
+
+    handle1.join().unwrap();
+    handle2.join().unwrap();
+}
+
+#[test]
+fn test_thread_park_2() {
+    let handle = thread::spawn(|| {
+        thread::sleep(Duration::from_millis(2_000));
+
+        thread::park();
+
+        println!("Hello from a park thread in case of unpark first");
+    });
+
+    handle.thread().unpark();
+
+    handle.join().unwrap();
+}
+
+#[test]
+fn test_wrong_start_threads_without_scoped() {
+    // let mut a = vec![1, 2, 3];
+    // let mut x = 0;
+    //
+    // thread::spawn(move || {
+    //    println!("Hello from the first scoped thread");
+    //     dbg!(&a);
+    // });
+    //
+    // thread::spawn(move || {
+    //    println!("Hello from the second scoped thread");
+    //     dbg!(&a);
+    // });
+    //
+    // println!("Hello from the main thread");
+    //
+    // a.push(4);
+    //
+    // assert_eq!(a.len(), x);
+}
+
+#[test]
+fn test_wrong_start_scoped_thread() {
+    let mut a = vec![1, 2, 3];
+    let mut x = 0;
+
+    thread::scope(|s| {
+        s.spawn(|| {
+            println!("hello from the first scoped thread");
+            dbg!(&a);
+        });
+
+        s.spawn(|| {
+            println!("hello from the second scoped thread");
+            x += a[0] + a[2];
+        });
+
+        println!("hello from the main thread");
+    });
+
+    a.push(4);
+
+    assert_eq!(x, a.len());
+}
+
+#[test]
+fn test_start_thread_with_thread_local() {
+    // 在这里，定义了 一个 thread local 的 key ，在外部线程和两个子线程中都修改了，但是修改 counter 只会影响本线程，
+    // 子线程修改后，不会影响 main 线程
+    thread_local!(static COUNTER: RefCell<u32> = RefCell::new(1));
+
+    COUNTER.with(|c| {
+        *c.borrow_mut() = 2;
+    });
+
+    let handle1 = thread::spawn(move || {
+        COUNTER.with(|c| {
+            *c.borrow_mut() = 3;
+        });
+
+        COUNTER.with(|c| {
+            println!("Hello from thread7, c = {}", *c.borrow());
+        });
+    });
+
+    let handle2 = thread::spawn(move || {
+        COUNTER.with(|c| {
+            *c.borrow_mut() = 4;
+        });
+
+        COUNTER.with(|c| {
+            println!("Hello from thread8, c = {}", *c.borrow());
+        });
+    });
+
+    COUNTER.with(|c| {
+        *c.borrow_mut() += 9;
+    });
+
+    handle1.join().unwrap();
+    handle2.join().unwrap();
+
+    COUNTER.with(|c| {
+        println!("Hello from main, c = {}", *c.borrow());
+    });
+}
+
+#[test]
+fn test_start_one_thread_with_move() {
+    let x = 100;
+
+    // 当我们在线程中引用变量 x 时，我们使用了 move，当我们没有引用变量时，没有使用 move
+    // 因为 x 是 i32 类型的，实现了 copy trait，实际在 move 的时候，复现的是它的值
+    //
+
+    let handle = thread::spawn(move || {
+        println!("hello from a thread with move, x={}", x);
+    });
+
+    handle.join().unwrap();
+
+    let handle = thread::spawn(move || {
+        println!("hello from a thread with move again, x={}", x);
+    });
+    handle.join().unwrap();
+
+    let handle = thread::spawn(|| {
+        println!("hello from a thread with move without move");
+    });
+
+    handle.join().unwrap();
+}
+
+// 如果 把 x 替换成一个 未实现 copy 的类型，类似的代码就无法通过编译了，因为所有权已经转移给第一个子线程了
+#[test]
+fn test_start_one_thread_with_move_2() {
+    let x = vec![1, 2, 3];
+
+    let handle = thread::spawn(move || {
+        println!("hello from a thread with move, x={:?}", x);
+    });
+
+    handle.join().unwrap();
+
+    // let handle = thread::spawn(move || {
+    //     println!("hello from a thread with move again, x={}", x);
+    // });
+    // handle.join().unwrap();
+
+    let handle = thread::spawn(|| {
+        println!("hello from a thread with move without move");
+    });
+
+    handle.join().unwrap();
 }
