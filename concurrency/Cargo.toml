@@ -1,5 +1,8 @@
 [workspace]
 
-members = ["_01_thread"
-    
+members = [
+    "_01_thread",
+    "_03_async_await",
+    "_04_synchronization_primitives",
+    "_05_basic_concurrency_primitives",
 ]
