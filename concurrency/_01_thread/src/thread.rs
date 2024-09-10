@@ -352,3 +352,33 @@ fn test_start_one_thread_with_move_2() {
 
     handle.join().unwrap();
 }
+
+
+#[test]
+fn test_control_thread() {
+}
+
+#[test]
+fn test_start_thread_with_priority() {
+}
+
+#[test]
+fn test_panic_thread() {
+    println!("Hello, world");
+
+    let handle = thread::spawn(|| {
+        thread::sleep(Duration::from_millis(2_000));
+        panic!("panic thread");
+    });
+
+    match handle.join() {
+        Ok(res ) => {
+        println!("All is well, res = {:?}", res);
+    },
+        Err(e) => {
+            println!("Got an error = {:?}", e);
+        }
+    }
+
+
+}
