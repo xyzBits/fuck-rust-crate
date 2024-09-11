@@ -1,4 +1,3 @@
-
 #[tokio::main]
 async fn main() {
     // Calling `say_world()` does not execute the body of `say_wrold`

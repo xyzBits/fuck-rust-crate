@@ -1,4 +1,3 @@
-
 /// The main function used to launch the application differs from the usual one found in
 /// most of Rust's crates
 // An async fn is used as we want to enter an asynchronous context. However,
