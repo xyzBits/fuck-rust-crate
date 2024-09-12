@@ -3,18 +3,17 @@ use tokio::task::yield_now;
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(async {
-        // The scope forces `rc` to drop before await
 
+    tokio::spawn(async {
+       // 在 .await 之前作用域中强制 rc drop
         {
-            let rc = Rc::new("hello");
+            let rc = Rc::new("hello world");
             println!("{}", rc);
+
         }
 
-        // rc is no longer used. It is not persisted when
-        // the task yields to the scheduler
+        // rc 不再使用，当任务返回到调度器后，rc 不能再持续下去
         yield_now().await;
 
-        // yields execution back to the tokio runtime.
     });
 }

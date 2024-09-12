@@ -1,15 +1,21 @@
 use std::rc::Rc;
+use tokio::main;
 use tokio::task::yield_now;
 
-#[tokio::main]
+#[main]
 async fn main() {
     tokio::spawn(async {
-        // future created by async block is not Send
-        let rc = Rc::new("hello");
+        /// future cannot be sent between threads safely
+        /// Rc 并没有实现 Send 所以不能跨线程移动，必须  提前 drop 否则编译无法通过
+       let rc = Rc::new("hello world");
 
-        // rc us used after await, it must be persisted to the task's state
+
+        // rc 不能跨线程移动，所以要先 drop
+        drop(rc);
+        // rc 在 .await 后继续使用，它必须持久化后 task 的状态中才行
+
         yield_now().await;
-
         // println!("{}", rc);
+
     });
 }
