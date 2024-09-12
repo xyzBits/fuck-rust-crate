@@ -1,7 +1,5 @@
-
 #[tokio::main]
 async fn main() {
-
     let v = vec![1, 2, 3, 4];
 
     tokio::task::spawn(async move {
@@ -9,9 +7,7 @@ async fn main() {
     });
 
     // println!("{:?}", v);
-
 }
-
 
 #[cfg(test)]
 mod static_lifetime {
@@ -20,7 +16,7 @@ mod static_lifetime {
     fn coerce_static<'a>(_: &'a i32) -> &'a i32 {
         &NUM
     }
-     static NUM: i32 = 18;
+    static NUM: i32 = 18;
     /// As a reference lifetime 'static indicates that the data pointed to by the reference
     /// lives for the entire lifetime of the running program. It can still be coerced to a
     /// shorter lifetime.
@@ -37,7 +33,6 @@ mod static_lifetime {
             // can no longer be used, but the data remains in the binary
         }
 
-
         {
             let lifetime_num = 9;
 
@@ -46,8 +41,5 @@ mod static_lifetime {
         }
 
         println!("NUM: {} stays accessible!", NUM);
-
-
-
     }
 }

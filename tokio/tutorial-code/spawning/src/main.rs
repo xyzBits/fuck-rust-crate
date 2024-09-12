@@ -3,14 +3,17 @@ use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
 async fn main() {
-
     // 绑定监听器到一个地址
     let mut listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
 
-
-    loop { // loop 不断接收新的 socket 连接
+    loop {
+        // loop 不断接收新的 socket 连接
         let (socket, _) = listener.accept().await.unwrap();
-        process(socket).await;
+
+        // 为生一个入站 socket 连接产生一个新的任务，此 socket 连接被移动到这个新任务中并且在里面处理
+        tokio::spawn(async move {
+            process(socket).await;
+        });
     }
 }
 

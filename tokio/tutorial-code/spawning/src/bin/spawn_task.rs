@@ -12,7 +12,6 @@ async fn main() {
     let out = handle.await.unwrap();
     println!("{}", out);
 
-
     let async_fn = async {
         println!("hello async");
     };
