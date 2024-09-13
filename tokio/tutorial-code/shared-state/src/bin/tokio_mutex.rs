@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::sync::{Arc};
+use std::sync::Arc;
 
 use bytes::Bytes;
 use mini_redis::{Command, Connection, Frame};
@@ -32,7 +32,6 @@ async fn main() {
 }
 
 async fn process(socket: TcpStream, db: DB) {
-
     // Connection, provided by mini-redis, handles parsing frames from
     let mut connection = Connection::new(socket);
 
