@@ -57,3 +57,70 @@ fn test_cow_clone() {
     assert_eq!(s, "HELLO WORLD");
     assert_eq!(origin, "hello world");
 }
+
+/// 将字符串的一部分进行替换，返回值类型是 String
+/// 意味着 每次函数调用都会分配新的内存空间来存储结果
+fn change_string(input: &str) -> String {
+    if input.contains("Java") {
+        input.replace("Java", "Rust")
+    } else {
+        input.to_string()
+    }
+}
+
+/// 只有当字符串中包含 Java 时，才会创建新的内存空间来存储替换后的结果，
+/// 其他情况下， 函数会直接返回对原字符串的引用，从而避免了内存分配的开销
+///
+/// Cow 通常适用于以下场景：
+/// - 函数返回值：当函数返回值可能要修改原始数据，也可能不修改原始数据，可以使用 Cow 来避免不必要的克隆操作
+/// - 数据结构： 在一些数据结构中，如 vector hashMap 可以使用 Cow 来实现高效的数据共享
+///
+///
+/// Cow 的优势：
+/// - 性能提升：避免不必要的克隆操作，Cow 可以有效地提高程序的性能，尤其是在处理大型数据结构时
+/// - 内存优化：Cow 可以减少程序的内存占用，因为它只在必要时才分配新的内存空间
+///
+/// Cow::Borrowed 表示对数据的引用，不进行任何克隆操作
+/// Cow::Owned 表示拥有数据的所有权，并在内存存储数据的副本
+fn change_string_with_cow(input: &str) -> Cow<str> {
+    if input.contains("Java") {
+        let replaced = input.replace("Java", "Rust");
+        Cow::Owned(replaced)
+    } else {
+        Cow::Borrowed(input)
+    }
+}
+
+#[test]
+fn test_change_string() {
+    let borrowed_str = "I love Java";
+    let changed_str = change_string(borrowed_str);
+
+    println!("{}", changed_str);
+}
+
+fn concat_strings<'a>(s1: &'a str, s2: &'a str) -> Cow<'a, str> {
+    if s1.is_empty() {
+        Cow::Borrowed(s2)
+    } else if s2.is_empty() {
+        Cow::Borrowed(s1)
+    } else {
+        let mut result = String::from(s1);
+        result.push_str(s2);
+        Cow::Owned(result)
+    }
+}
+
+#[test]
+fn test_concat_strings() {
+    let str1 = "Hello, ";
+    let str2 = "world!";
+
+    let result1 = concat_strings(str1, str2);
+    println!("{}", result1);
+
+    let str3 = "";
+    let result2 = concat_strings(str1, str3);
+
+    println!("{}", result2);
+}
