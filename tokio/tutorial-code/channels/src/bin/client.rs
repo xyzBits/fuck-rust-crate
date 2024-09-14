@@ -9,7 +9,6 @@ use mini_redis::client;
 ///
 #[tokio::main]
 async fn main() {
-
     // 建立一个与 Server 的连接
     let mut client = client::connect("127.0.0.1:6379").await.unwrap();
 
