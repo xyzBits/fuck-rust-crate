@@ -3,7 +3,6 @@ use tokio::net::TcpStream;
 
 mod delay;
 mod main_future;
-mod mini_tokio;
 
 async fn my_async_fn() {
     println!("hello from async");
@@ -34,4 +33,4 @@ async fn test_my_async_fn() {
     // 直到 .await 后，文本才被打印，socket 连接也被关闭
 }
 
-const TIMESTAMP_FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
+pub const TIMESTAMP_FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
