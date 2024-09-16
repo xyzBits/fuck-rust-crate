@@ -1,3 +1,4 @@
+use chrono::Local;
 use std::future::Future;
 use tokio::net::TcpStream;
 
@@ -35,3 +36,7 @@ async fn test_my_async_fn() {
 }
 
 pub const TIMESTAMP_FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
+
+pub fn local_now() -> String {
+    Local::now().format(TIMESTAMP_FORMAT).to_string()
+}
