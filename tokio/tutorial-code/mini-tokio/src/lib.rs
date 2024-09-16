@@ -1,13 +1,9 @@
-use chrono::Local;
 use std::future::Future;
-use std::pin::Pin;
-use std::task::{Context, Poll};
-use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
 
+mod delay;
 mod main_future;
 mod mini_tokio;
-mod delay;
 
 async fn my_async_fn() {
     println!("hello from async");
@@ -39,4 +35,3 @@ async fn test_my_async_fn() {
 }
 
 const TIMESTAMP_FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
-

@@ -1,8 +1,8 @@
+use crate::delay::Delay;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 use std::time::{Duration, Instant};
-use crate::delay::Delay;
 
 enum MainFuture {
     // 初始化，但永远不会被  poll

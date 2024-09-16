@@ -1,10 +1,10 @@
+use crate::TIMESTAMP_FORMAT;
+use chrono::Local;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 use std::thread;
 use std::time::{Duration, Instant};
-use chrono::Local;
-use crate::TIMESTAMP_FORMAT;
 
 pub struct Delay {
     pub when: Instant,
@@ -33,7 +33,7 @@ impl Future for Delay {
             // 生成一个线程计时器
             // 计时器用来模拟一个阻塞等待的资源，一旦计时结束，资源准备好了，资源会通过 waker.wake() 调用通知执行器我们的任务再次被调度执行了
             thread::spawn(move || {
-               let now = Instant::now();
+                let now = Instant::now();
 
                 if now < when {
                     thread::sleep(when - now);
@@ -42,7 +42,6 @@ impl Future for Delay {
                 waker.wake();
             });
             Poll::Pending
-
 
             // // 目前先忽略这行代码
             // cx.waker().wake_by_ref();
