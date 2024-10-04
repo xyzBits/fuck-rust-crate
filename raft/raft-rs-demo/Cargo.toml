@@ -1,0 +1,11 @@
+[package]
+name = "raft-rs-demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+raft = "0.7.0"
+slog = "2.7.0"
+slog-stdlog = "4.1.1"
+slog-async = "2.8.0"
+slog-term = "2.9.1"
