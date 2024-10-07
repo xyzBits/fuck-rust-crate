@@ -33,9 +33,9 @@ fn main() {
     // messages from others, and uses the respective `Sender` to send messages to others.
     let (mut sender_vec, mut receiver_vec) = (Vec::new(), Vec::new());
     for _ in 0..NUM_NODES {
-        let (tx, rx) = mpsc::channel();
-        sender_vec.push(tx);
-        receiver_vec.push(rx);
+        let (sender, receiver) = mpsc::channel();
+        sender_vec.push(sender);
+        receiver_vec.push(receiver);
     }
 
     let (stop_signal_sender, stop_signal_receiver) = mpsc::channel();

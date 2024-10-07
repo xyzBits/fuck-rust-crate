@@ -147,8 +147,8 @@ fn on_ready(raft_group: &mut RawNode<MemStorage>, callback_map: &mut HashMap<u8,
             }
 
             if entry.get_entry_type() == EntryType::EntryNormal {
-                if let Some(cb) = callback_map.remove(entry.data.first().unwrap()) {
-                    cb();
+                if let Some(propose_callback) = callback_map.remove(entry.data.first().unwrap()) {
+                    propose_callback();
                 }
             }
 
@@ -194,7 +194,7 @@ fn send_propose(logger: Logger, sender: mpsc::Sender<Msg>) {
         // Wait some time and send the request to the Raft.
         thread::sleep(Duration::from_secs(10));
 
-        let (s1, r1) = mpsc::channel::<u8>();
+        let (response_sender, response_receiver) = mpsc::channel::<u8>();
 
         info!(logger, "propose a request");
 
@@ -204,12 +204,12 @@ fn send_propose(logger: Logger, sender: mpsc::Sender<Msg>) {
             .send(Msg::Propose {
                 id: 1,
                 propose_call_back: Box::new(move || {
-                    s1.send(0).unwrap();
+                    response_sender.send(0).unwrap();
                 }),
             })
             .unwrap();
 
-        let n = r1.recv().unwrap();
+        let n = response_receiver.recv().unwrap();
         assert_eq!(n, 0);
 
         info!(logger, "receive the propose callback");
