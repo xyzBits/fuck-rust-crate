@@ -3,4 +3,44 @@ name = "raft-kv-rocksdb"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "raft-key-value-rocks"
+path = "src/bin/main.rs"
+
 [dependencies]
+#openraft = { version = "0.9.16" }
+#openraft = { git = "https://github.com/datafuselabs/openraft", rev = "2262c79f5195307402e7a0994771b4152c0d10b2" }
+openraft = { git = "https://github.com/databendlabs/openraft.git", features = [
+    "serde",
+    "type-alias",
+    "loosen-follower-log-revert",
+] }
+
+tokio = { version = "1.35.1", features = ["full"] }
+byteorder = "1.4.3"
+clap = { version = "4.1.11", features = ["derive", "env"] }
+reqwest = { version = "0.12.5", features = ["json"] }
+rocksdb = "0.22.0"
+serde = { version = "1.0.114", features = ["derive"] }
+serde_json = "1.0.57"
+tide = { version = "0.16" }
+# for toy-rpc, use `serde_json` instead of the default `serde_bincode`:
+# bincode which enabled by default by toy-rpc, does not support `#[serde(flatten)]`: https://docs.rs/bincode/2.0.0-alpha.1/bincode/serde/index.html#known-issues
+toy-rpc = { version = "0.10.0", features = [
+    "ws_tokio",
+    "server",
+    "client",
+    "tokio_runtime",
+] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.0", features = ["env-filter"] }
+
+[dev-dependencies]
+maplit = "1.0.2"
+tempfile = { version = "3.4.0" }
+
+
+[features]
+
+[package.metadata.docs.rs]
+all-features = true
