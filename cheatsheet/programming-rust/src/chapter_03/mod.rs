@@ -60,7 +60,6 @@ fn test_04() {
     assert_eq!(false as u8, 0);
 }
 
-
 #[test]
 fn test_05() {
     assert_eq!('*' as i32, 42);
@@ -150,7 +149,7 @@ fn test_11() {
 fn test_12() {
     let mut palindrome = vec!["a man", "a plan", "a canal", "panama"];
     palindrome.reverse();
-    assert_eq!(palindrome, vec!["panama", "a canal", "a plan", "a man", ]);
+    assert_eq!(palindrome, vec!["panama", "a canal", "a plan", "a man",]);
 }
 
 #[test]
@@ -208,8 +207,8 @@ fn test_16() {
     let sv: &[f64] = &v;
     let sa: &[f64] = &a;
 
-    print_slice(&v);// 可以用于vector
-    print_slice(&a);// 可以用于数组
+    print_slice(&v); // 可以用于vector
+    print_slice(&a); // 可以用于数组
 
     print_slice(&v[..2]);
     print_slice(&a[2..]);
@@ -217,3 +216,15 @@ fn test_16() {
     // 尝试超过数据结尾会导致 panic
 }
 
+// &str 就相当于 &[u8]
+#[test]
+fn test_17() {
+    let mut data = vec![9, 1, 2, 3, 4];
+    print_slice(&data);
+
+    // 可以使用可变切片引用进行一些排序，逆序的操作，但是无法 添加 或者 删除元素
+    let slice_data = &mut data[..2];
+    slice_data.sort();
+    slice_data.reverse();
+    println!("{:?}", data);
+}
