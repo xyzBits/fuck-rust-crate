@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use std::thread::ThreadId;
 
 #[test]
@@ -177,4 +178,35 @@ fn test_12() {
     let first_name = composers[0].name.take();
     println!("{:?}", composers);
     println!("{}", first_name.unwrap());
+}
+
+#[test]
+fn test_13() {
+    #[derive(Debug)]
+    struct Label {
+        number: i32,
+    }
+
+    fn print_label(label: Label) {
+        println!("{:?}", label);
+    }
+
+    let label = Label { number: 1 };
+    print_label(label);
+
+    // 默认情况下 struct enum 都是 move类型
+    // println!("{:?}", label);
+}
+
+#[test]
+fn test_14() {
+    let s = Rc::new("shirataki".to_string());
+
+    let t = s.clone();
+    let u = s.clone();
+
+    // 可以直接对 Rc<String> 使用任何 String 的方法
+    assert!(s.contains("shira"));
+    assert_eq!(t.find("taki"), Some(5));
+    println!("{} are quiet chewy, almost bouncy, but lack flavor", u);
 }
