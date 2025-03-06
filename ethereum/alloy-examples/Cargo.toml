@@ -1,0 +1,9 @@
+[package]
+name = "alloy-examples"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+alloy = { version = "0.11", features = ["full"] }
+tokio = "1.42"
+eyre = "0.6"
