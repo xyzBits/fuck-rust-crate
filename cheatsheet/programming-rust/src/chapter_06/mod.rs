@@ -88,3 +88,24 @@ fn test_07() {
     let is_odd = |x: i64| x % 2 != 0;
     assert_eq!(is_odd(5), true);
 }
+
+
+#[test]
+fn test_08() {
+    let name = "123".to_owned();
+    let opt: Option<i32> = Some(1);
+
+    let step_1 = opt.map(|_| name);
+
+    // if let Some(name) = step_1 {
+    //     println!("{}", name);
+    // } else {
+    //     let _closure = || name;
+    // }
+
+    // let string = opt
+    //     .map(|_| name)
+    //     .unwrap_or_else(|| "Hello World".to_owned());
+    //
+    // println!("{}", string);
+}
