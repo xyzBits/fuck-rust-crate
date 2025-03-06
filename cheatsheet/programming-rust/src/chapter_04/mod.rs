@@ -1,3 +1,6 @@
+mod stack;
+mod raw_ptr;
+
 use std::rc::Rc;
 use std::thread::ThreadId;
 
