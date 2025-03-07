@@ -89,7 +89,6 @@ fn test_07() {
     assert_eq!(is_odd(5), true);
 }
 
-
 #[test]
 fn test_08() {
     let name = "123".to_owned();

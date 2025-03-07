@@ -132,7 +132,7 @@ fn test_07() {
         text: Some("Hello World!".to_string()),
     };
 
-    let stolen_text = s.text.take().unwrap();// 转移所有权，留下 None
+    let stolen_text = s.text.take().unwrap(); // 转移所有权，留下 None
     println!("{}", stolen_text);
     println!("{:?}", s.text);
 }
