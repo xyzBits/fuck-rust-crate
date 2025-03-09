@@ -1,10 +1,9 @@
-use hello_macro::Hello;
+use hello_macro::HelloMacro;
+use hello_macro_derive::HelloMacro;
 
-#[derive(Hello)]
+#[derive(HelloMacro)]
 struct Person;
 
 fn main() {
-    let p = Person;
-
-    println!("{}", p.hello());
+    Person::hello_macro();
 }
