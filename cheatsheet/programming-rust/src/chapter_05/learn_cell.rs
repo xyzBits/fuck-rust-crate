@@ -132,10 +132,55 @@ fn test_03() {
 
 
 
+struct Library {
+    books: Vec<String>,
+}
+
+#[test]
+fn test_04() {
+    let library = RefCell::new(
+        Library {
+            books: vec!["book1".to_string(), "book2".to_string()],
+        }
+    );
+
+    let borrow1 = library.borrow();// 第一个不可变借用
+    let borrow2 = library.borrow();// 第二个不可变借用
+
+    println!("Book1: {}", borrow1.books[0]);
+    println!("Book2: {}", borrow2.books[1]);
+
+    // 在这里释放后，就可以在下面再进行可变借用了
+    drop(borrow1);
+    drop(borrow2);
+
+    let mut borrow3 = library.borrow_mut();// 在有不可变借用时，尝试可变借用
+
+    borrow3.books.push("book3".to_string());
+}
 
 
+struct Counter {
+    value: u32,
+}
 
+#[test]
+fn test_05() {
+    let counter = RefCell::new(
+        Counter {
+            value: 0
+        }
+    );
 
+    {
+        let borrow1 = counter.borrow();
+        println!("Value: {}", borrow1.value);
+    }// borrow1 在这里结束
+
+    let mut borrow2 = counter.borrow_mut();
+    borrow2.value += 1;
+    println!("Value: {}", borrow2.value);
+}
 
 
 
