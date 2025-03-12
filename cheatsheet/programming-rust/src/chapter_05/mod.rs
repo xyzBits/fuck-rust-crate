@@ -1,3 +1,6 @@
+mod learn_cell;
+mod learn_borrow;
+
 use std::collections::HashMap;
 
 type Table = HashMap<String, Vec<String>>;
