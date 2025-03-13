@@ -1,5 +1,6 @@
 mod learn_cell;
 mod learn_borrow;
+mod learn_send_sync;
 
 use std::collections::HashMap;
 
