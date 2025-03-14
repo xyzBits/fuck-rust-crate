@@ -11,5 +11,6 @@ async fn main() -> Result<()> {
     let latest_block = provider.get_block_number().await?;
 
     println!("Latest block number: {}", latest_block);
+
     Ok(())
 }
