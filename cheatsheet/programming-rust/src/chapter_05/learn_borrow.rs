@@ -7,18 +7,16 @@ struct User {
 
 #[test]
 fn test_01() {
-    let user = RefCell::new(
-        User {
-            name: "Alice".to_string(),
-            age: 20,
-        }
-    );
+    let user = RefCell::new(User {
+        name: "Alice".to_string(),
+        age: 20,
+    });
 
-    let mut borrow1 = user.borrow_mut();// 第一个可变借用
+    let mut borrow1 = user.borrow_mut(); // 第一个可变借用
     borrow1.age = 31;
 
-    let mut borrow2 = user.borrow_mut();// 尝试第二个可变借用
-    borrow2.name = "Bob".to_string();// 这一行会导致 panic
+    let mut borrow2 = user.borrow_mut(); // 尝试第二个可变借用
+    borrow2.name = "Bob".to_string(); // 这一行会导致 panic
 }
 
 #[test]
@@ -34,14 +32,12 @@ fn test_02() {
 
         let borrow2: &i32 = &b;
         println!("{}", borrow2);
-    }// 在此处释放
+    } // 在此处释放
 
     {
         let borrow_mut = &mut *b;
         *borrow_mut = 6;
+    } // 在此处释放
 
-    }// 在此处释放
-
-    println!("{}", b);// box 仍然可用
-
+    println!("{}", b); // box 仍然可用
 }

@@ -1,6 +1,10 @@
-mod learn_cell;
 mod learn_borrow;
+mod learn_cell;
+mod learn_iter;
+mod learn_object_trait;
 mod learn_send_sync;
+mod learn_static;
+mod learn_sized;
 
 use std::collections::HashMap;
 

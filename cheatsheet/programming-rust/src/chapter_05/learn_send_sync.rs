@@ -13,13 +13,11 @@ use std::thread;
 #[test]
 fn test_01() {
     // 当你需要将数据的所有权转移给另一个线程时，编译器会检查类型是否实现了 Send
-    let value = 42;// i32 实现了 Send
+    let value = 42; // i32 实现了 Send
     thread::spawn(move || {
-       println!("Received: {}", value);
+        println!("Received: {}", value);
     });
-
 }
-
 
 #[test]
 fn test_02() {
@@ -32,7 +30,6 @@ fn test_02() {
     //    println!("Received: {}", data_clone);
     // });
 }
-
 
 #[test]
 fn test_03() {
@@ -70,56 +67,9 @@ fn test_04() {
     // handle.join().unwrap();
 }
 
+#[test]
+fn test_05() {
+    let data = "hello world";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    let v = [1, 2, 3];
+}

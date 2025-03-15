@@ -26,13 +26,15 @@ struct CellConfig {
 
 impl CellConfig {
     fn new() -> Self {
-        CellConfig { count: Cell::new(0) }
+        CellConfig {
+            count: Cell::new(0),
+        }
     }
 
     fn increment(&self) {
         // 表面上不可变，内部却可以悄悄变化
-        let current = self.count.get();// 获取当前值
-        self.count.set(current + 1);// 设置新值
+        let current = self.count.get(); // 获取当前值
+        self.count.set(current + 1); // 设置新值
     }
 
     fn get_count(&self) -> u32 {
@@ -43,8 +45,8 @@ impl CellConfig {
 #[test]
 fn test_01() {
     let cell_config = CellConfig::new();
-    cell_config.increment();// 增加计数器
-    println!("Count: {}", cell_config.get_count());// 输出count: 1
+    cell_config.increment(); // 增加计数器
+    println!("Count: {}", cell_config.get_count()); // 输出count: 1
 }
 
 /// RefCell<T>
@@ -60,11 +62,14 @@ struct RefCellConfig {
 
 impl RefCellConfig {
     fn new() -> Self {
-        RefCellConfig { count: RefCell::new(0), data: RefCell::new(vec![0]) }
+        RefCellConfig {
+            count: RefCell::new(0),
+            data: RefCell::new(vec![0]),
+        }
     }
 
     fn increment(&self) {
-        let mut count = self.count.borrow_mut();// 获取可变借用
+        let mut count = self.count.borrow_mut(); // 获取可变借用
         *count += 1;
 
         let mut data = self.data.borrow_mut();
@@ -75,9 +80,8 @@ impl RefCellConfig {
         let data = self.data.borrow();
         let len = data.len();
         println!("data len: {}", len);
-        let count = self.count.borrow();// 获取不可变借用
+        let count = self.count.borrow(); // 获取不可变借用
         *count
-
     }
 }
 
@@ -93,9 +97,7 @@ fn test_02() {
 /// Mutex 保证同一时间只有一个线程能够修改数据
 /// RwLock 允许多个线程读取，但修改时需要独占访问
 ///
-struct MutexConfig {
-
-}
+struct MutexConfig {}
 
 #[test]
 fn test_03() {
@@ -107,7 +109,7 @@ fn test_03() {
         let config = Arc::clone(&config);
         let handle = thread::spawn(move || {
             thread::sleep(Duration::new(2, 0));
-            let read_guard = config.read().unwrap();// 获取 读锁
+            let read_guard = config.read().unwrap(); // 获取 读锁
             println!("read: {}", *read_guard);
         });
         handles.push(handle);
@@ -115,7 +117,7 @@ fn test_03() {
 
     let config_write = Arc::clone(&config);
     let handle = thread::spawn(move || {
-        let mut write_guard = config_write.write().unwrap();// 获取写锁
+        let mut write_guard = config_write.write().unwrap(); // 获取写锁
         *write_guard = "updated config".to_string();
         println!("write: update config");
     });
@@ -128,24 +130,18 @@ fn test_03() {
     println!("Final config: {}", *config.read().unwrap());
 }
 
-
-
-
-
 struct Library {
     books: Vec<String>,
 }
 
 #[test]
 fn test_04() {
-    let library = RefCell::new(
-        Library {
-            books: vec!["book1".to_string(), "book2".to_string()],
-        }
-    );
+    let library = RefCell::new(Library {
+        books: vec!["book1".to_string(), "book2".to_string()],
+    });
 
-    let borrow1 = library.borrow();// 第一个不可变借用
-    let borrow2 = library.borrow();// 第二个不可变借用
+    let borrow1 = library.borrow(); // 第一个不可变借用
+    let borrow2 = library.borrow(); // 第二个不可变借用
 
     println!("Book1: {}", borrow1.books[0]);
     println!("Book2: {}", borrow2.books[1]);
@@ -154,11 +150,10 @@ fn test_04() {
     drop(borrow1);
     drop(borrow2);
 
-    let mut borrow3 = library.borrow_mut();// 在有不可变借用时，尝试可变借用
+    let mut borrow3 = library.borrow_mut(); // 在有不可变借用时，尝试可变借用
 
     borrow3.books.push("book3".to_string());
 }
-
 
 struct Counter {
     value: u32,
@@ -166,60 +161,14 @@ struct Counter {
 
 #[test]
 fn test_05() {
-    let counter = RefCell::new(
-        Counter {
-            value: 0
-        }
-    );
+    let counter = RefCell::new(Counter { value: 0 });
 
     {
         let borrow1 = counter.borrow();
         println!("Value: {}", borrow1.value);
-    }// borrow1 在这里结束
+    } // borrow1 在这里结束
 
     let mut borrow2 = counter.borrow_mut();
     borrow2.value += 1;
     println!("Value: {}", borrow2.value);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
