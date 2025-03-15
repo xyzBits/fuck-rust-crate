@@ -1,7 +1,7 @@
 use alloy::node_bindings::Anvil;
 use alloy::providers::{Provider, ProviderBuilder, WsConnect};
 use eyre::Result;
-use futures_util::{stream, StreamExt};
+use futures_util::{StreamExt, stream};
 
 #[tokio::main]
 async fn main() -> Result<()> {

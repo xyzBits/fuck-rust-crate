@@ -35,8 +35,9 @@ serde = "1.0"
 serde_json = "1.0"
 
 
-alloy-primitives = "0.1"      # 提供地址等基本类型
-alloy-signer = "0.1"          # 提供 Signer trait
-alloy-signer-local = "0.1"    # 提供 LocalWallet 结构体
-secp256k1 = "0.20"            # 用于公钥派生
-hex = "0.4"                   # 用于字节转十六进制字符串
+
+alloy-primitives = "0.1"
+alloy-signer = "0.1"
+k256 = "0.13"
+rand = "0.8"
+hex = "0.4.3"# 用于字节转十六进制字符串
