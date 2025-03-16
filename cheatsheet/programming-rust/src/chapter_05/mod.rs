@@ -5,6 +5,8 @@ mod learn_object_trait;
 mod learn_send_sync;
 mod learn_static;
 mod learn_sized;
+mod learn_pin;
+mod pin_to_stack;
 
 use std::collections::HashMap;
 

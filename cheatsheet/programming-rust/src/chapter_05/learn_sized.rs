@@ -46,3 +46,24 @@ fn test_03() {
     let data = [1, 2, 3];
     print_sized(&data[..]);
 }
+
+// Sized 表示类型的大小在编译时已知
+// dyn trait 是不定长的，但 &dyn trait Box<dyn trait> 是胖指针，是定长的
+// dyn trait 在编译时，你是不知道到底代表的什么实例，无法知道大小
+// vtable 记录了某种类型，比如 dog cat 的方法地址
+
+struct MySlice<T: ?Sized>{
+    info: u32,
+    data: T, // 必须是最后一个字段
+}
+
+#[test]
+fn test_04() {
+    let arr = [1, 2, 3];
+    let my_slice = &MySlice {
+        info: 42,
+        data: arr,
+    };
+
+
+}
