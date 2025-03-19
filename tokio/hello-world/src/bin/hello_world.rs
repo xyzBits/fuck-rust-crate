@@ -15,5 +15,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("wrote to stream, success={:?}", result.is_ok());
 
     Ok(())
-
 }
