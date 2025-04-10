@@ -1,0 +1,13 @@
+[package]
+name = "r-nacos-examples"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+actix-http = "3"
+actix = "0.13"
+actix-rt = "2"
+actix-multipart = "0.6"
+serde = {version = "1.0", features = ["derive"]}
+clap = {version = "4.5", features = ["derive"]}
