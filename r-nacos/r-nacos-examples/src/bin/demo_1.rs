@@ -1,12 +1,17 @@
 use actix_web::web::Data;
 use actix_web::{App, HttpResponse, HttpServer, Responder, delete, get, post, put, web};
+
+use env_logger::TimestampPrecision;
+use env_logger_timezone_fmt::{TimeZoneFormat, TimeZoneFormatEnv};
+
 use r_nacos_examples::cli;
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 // parse() 是 clap::Parser trait 提供的方法，而 Rust 要求 trait 在调用其他方法时必须在作用域内
 // 不引入，rust 编译器找不到 parse() 方法，使用 uer::Parser 让编译器知道 可以调用 parse 方法
 use clap::Parser;
+use r_nacos_examples::common::AppSysConfig;
 
 // actix_web::main 是 Actix Web 提供的一个属性宏，主要作用是将一个普通的异步async函数
 // 转为 Actix Web 应用程序的入口，让你的main函数能够运行 actix web 的异步环境，用于启动 web服务器
@@ -32,6 +37,15 @@ async fn main() -> std::io::Result<()> {
     unsafe {
         std::env::set_var("RUST_LOG", &rust_log);
     }
+
+
+    let sys_config = Arc::new(AppSysConfig::init_from_env());
+
+
+    let timezone_fmt = Arc::new(TimeZoneFormatEnv::new(
+       sys_config.gmt_fixed_offset_hours.map(|v| v * 60 * 60),
+       Some(TimestampPrecision::Micros)
+    ));
 
     // 结构体的一个方法，用于在所有路由和处理函数中共享的资源，例如数据库连接池，配置设置或者其他全局状态
     let app_state = Data::new(AppState {
