@@ -1,17 +1,19 @@
 use actix_web::web::Data;
-use actix_web::{App, HttpResponse, HttpServer, Responder, delete, get, post, put, web};
+use actix_web::{delete, get, post, put, web, App, HttpResponse, HttpServer, Responder};
 
 use env_logger::TimestampPrecision;
 use env_logger_timezone_fmt::{TimeZoneFormat, TimeZoneFormatEnv};
 
-use r_nacos_examples::cli;
-use serde::{Deserialize, Serialize};
-use std::env;
-use std::sync::{Arc, Mutex};
 // parse() 是 clap::Parser trait 提供的方法，而 Rust 要求 trait 在调用其他方法时必须在作用域内
 // 不引入，rust 编译器找不到 parse() 方法，使用 uer::Parser 让编译器知道 可以调用 parse 方法
 use clap::Parser;
+use r_nacos_examples::cli;
 use r_nacos_examples::common::AppSysConfig;
+use serde::{Deserialize, Serialize};
+use std::env;
+use std::sync::{Arc, Mutex};
+use r_nacos_examples::cli::Commands;
+use r_nacos_examples::transfer::data_to_sqlite::data_to_sqlite;
 
 // actix_web::main 是 Actix Web 提供的一个属性宏，主要作用是将一个普通的异步async函数
 // 转为 Actix Web 应用程序的入口，让你的main函数能够运行 actix web 的异步环境，用于启动 web服务器
@@ -26,6 +28,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     let cli_opt = cli::Cli::parse();
+    init_env(&cli_opt.env_file);
 
     // 从环境变量中读取名为 RUST_LOG 的值，并将其存储在变量 rust_log 中，如果环境变量读取失败，则使用默认值 info
     // std::env::var 是 std lig 中的函数，用于读取指定名称的环境变量
@@ -38,14 +41,18 @@ async fn main() -> std::io::Result<()> {
         std::env::set_var("RUST_LOG", &rust_log);
     }
 
-
     let sys_config = Arc::new(AppSysConfig::init_from_env());
 
-
     let timezone_fmt = Arc::new(TimeZoneFormatEnv::new(
-       sys_config.gmt_fixed_offset_hours.map(|v| v * 60 * 60),
-       Some(TimestampPrecision::Micros)
+        sys_config.gmt_fixed_offset_hours.map(|v| v * 60 * 60),
+        Some(TimestampPrecision::Micros),
     ));
+
+    env_logger::Builder::from_default_env()
+        .format(move |buf, record| TimeZoneFormat::new(buf, &timezone_fmt).write(record))
+        .init();
+
+    log::info!("start");
 
     // 结构体的一个方法，用于在所有路由和处理函数中共享的资源，例如数据库连接池，配置设置或者其他全局状态
     let app_state = Data::new(AppState {
@@ -145,4 +152,38 @@ async fn delete_user(path: web::Path<u32>, state: web::Data<AppState>) -> impl R
     } else {
         HttpResponse::NotFound().finish()
     }
+}
+
+// .env 文件中加载环境变量到程序，用来存放一些配置信息或者敏感数据
+fn init_env(env_path: &str) {
+    if env_path.is_empty() {
+        dotenv::dotenv().ok();// 如果不存在 .env 就加载
+    } else {
+        dotenv::from_path(env_path).ok();// 如果存在 则从指定的path 中加载
+    }
+}
+
+
+async fn run_subcommand(commands: Commands) -> Result<(), Box<dyn std::error::Error>> {
+    match commands {
+        Commands::DataToSqlite { file, out } => {
+            log::info!("middle data to sqlite, from:{file} to:{out}");
+            data_to_sqlite(&file, &out).await?;
+        }
+        Commands::SqliteToData { .. } => {
+
+        }
+
+        Commands::MysqlToData { .. } => {
+
+        }
+
+        Commands::OpenapiToData { .. } => {
+
+        }
+
+
+
+    }
+    Ok(())
 }
