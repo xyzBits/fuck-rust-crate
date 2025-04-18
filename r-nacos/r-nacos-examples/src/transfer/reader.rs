@@ -1,7 +1,15 @@
+use crate::common::protobuf_utils::FileMessageReader;
+use crate::transfer::TransferHeader;
+use crate::transfer::model::{TransferHeaderDto, TransferRecordRef};
 use quick_protobuf::BytesReader;
 use tokio::fs::OpenOptions;
-use crate::common::protobuf_utils::FileMessageReader;
-use crate::transfer::model::TransferHeaderDto;
+
+pub(crate) fn reader_transfer_record<'a>(
+    v: &'a [u8],
+    header: &'a TransferHeaderDto,
+) -> anyhow::Result<TransferRecordRef<'a>> {
+    todo!()
+}
 
 pub struct TransferFileReader {
     message_reader: FileMessageReader,
@@ -20,17 +28,17 @@ impl TransferFileReader {
             let mut reader = BytesReader::from_bytes(&v);
             let header_do: TransferHeader = reader.read_message(&v)?;
             header_do.into()
-        }
+        } else {
+            return Err(anyhow::anyhow!("read header error from transfer file"));
+        };
+
+        Ok(Self {
+            message_reader,
+            header,
+        })
+    }
+
+    pub async fn read_record_vec(&mut self) -> anyhow::Result<Option<Vec<u8>>> {
+        todo!()
     }
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -1,8 +1,8 @@
 use crate::common::string_utils::StringUtils;
 
 pub mod constant;
-pub mod string_utils;
 pub mod protobuf_utils;
+pub mod string_utils;
 
 use std::sync::Arc;
 

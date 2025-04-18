@@ -1,5 +1,5 @@
 use actix_web::web::Data;
-use actix_web::{delete, get, post, put, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpResponse, HttpServer, Responder, delete, get, post, put, web};
 
 use env_logger::TimestampPrecision;
 use env_logger_timezone_fmt::{TimeZoneFormat, TimeZoneFormatEnv};
@@ -8,19 +8,19 @@ use env_logger_timezone_fmt::{TimeZoneFormat, TimeZoneFormatEnv};
 // 不引入，rust 编译器找不到 parse() 方法，使用 uer::Parser 让编译器知道 可以调用 parse 方法
 use clap::Parser;
 use r_nacos_examples::cli;
+use r_nacos_examples::cli::Commands;
 use r_nacos_examples::common::AppSysConfig;
+use r_nacos_examples::transfer::data_to_sqlite::data_to_sqlite;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::sync::{Arc, Mutex};
-use r_nacos_examples::cli::Commands;
-use r_nacos_examples::transfer::data_to_sqlite::data_to_sqlite;
 
 // actix_web::main 是 Actix Web 提供的一个属性宏，主要作用是将一个普通的异步async函数
 // 转为 Actix Web 应用程序的入口，让你的main函数能够运行 actix web 的异步环境，用于启动 web服务器
 // actix_web::main 是一个方便的工具，简化了 web 应用程序的启动过程，通过在异步函数上添加这个宏
 // 可以直接编写异步代码运行web 服务器，无需手动配置运行
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("version: {}", get_app_version());
 
     for (key, value) in env::vars() {
@@ -52,6 +52,10 @@ async fn main() -> std::io::Result<()> {
         .format(move |buf, record| TimeZoneFormat::new(buf, &timezone_fmt).write(record))
         .init();
 
+    if let Some(cmd) = cli_opt.command {
+        return run_subcommand(cmd).await;
+    }
+
     log::info!("start");
 
     // 结构体的一个方法，用于在所有路由和处理函数中共享的资源，例如数据库连接池，配置设置或者其他全局状态
@@ -74,7 +78,9 @@ async fn main() -> std::io::Result<()> {
     })
     .bind("127.0.0.1:6789")? // 绑定到本地 5678 端口
     .run() // 启动服务器
-    .await // 等待服务器运行完成
+    .await?; // 等待服务器运行完成
+
+    Ok(())
 }
 
 fn get_app_version() -> &'static str {
@@ -157,12 +163,11 @@ async fn delete_user(path: web::Path<u32>, state: web::Data<AppState>) -> impl R
 // .env 文件中加载环境变量到程序，用来存放一些配置信息或者敏感数据
 fn init_env(env_path: &str) {
     if env_path.is_empty() {
-        dotenv::dotenv().ok();// 如果不存在 .env 就加载
+        dotenv::dotenv().ok(); // 如果不存在 .env 就加载
     } else {
-        dotenv::from_path(env_path).ok();// 如果存在 则从指定的path 中加载
+        dotenv::from_path(env_path).ok(); // 如果存在 则从指定的path 中加载
     }
 }
-
 
 async fn run_subcommand(commands: Commands) -> Result<(), Box<dyn std::error::Error>> {
     match commands {
@@ -170,20 +175,11 @@ async fn run_subcommand(commands: Commands) -> Result<(), Box<dyn std::error::Er
             log::info!("middle data to sqlite, from:{file} to:{out}");
             data_to_sqlite(&file, &out).await?;
         }
-        Commands::SqliteToData { .. } => {
+        Commands::SqliteToData { .. } => {}
 
-        }
+        Commands::MysqlToData { .. } => {}
 
-        Commands::MysqlToData { .. } => {
-
-        }
-
-        Commands::OpenapiToData { .. } => {
-
-        }
-
-
-
+        Commands::OpenapiToData { .. } => {}
     }
     Ok(())
 }
