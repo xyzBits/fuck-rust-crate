@@ -3,6 +3,7 @@ use crate::common::string_utils::StringUtils;
 pub mod constant;
 pub mod protobuf_utils;
 pub mod string_utils;
+pub mod pb;
 
 use std::sync::Arc;
 
