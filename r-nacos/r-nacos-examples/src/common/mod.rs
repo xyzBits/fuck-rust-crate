@@ -1,12 +1,14 @@
 use crate::common::string_utils::StringUtils;
 
 pub mod constant;
-pub mod protobuf_utils;
-pub mod string_utils;
 pub mod pb;
+pub mod protobuf_utils;
+pub mod rusqlite_utils;
+pub mod string_utils;
 
 use std::sync::Arc;
 
+pub const EMPTY_STR: &str = "";
 const DEFAULT_DB_PATH: &str = "nacos_db";
 
 #[derive(Default, Clone, Debug)]

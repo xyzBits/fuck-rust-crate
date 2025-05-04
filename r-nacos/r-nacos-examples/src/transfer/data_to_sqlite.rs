@@ -1,11 +1,11 @@
 use crate::common::constant::{CONFIG_TREE_NAME, NAMESPACE_TREE_NAME, USER_TREE_NAME};
-use crate::transfer::model::TransferRecordRef;
+use crate::transfer::model::{TransferRecordRef, UserDo};
 use crate::transfer::reader::{TransferFileReader, reader_transfer_record};
 use crate::transfer::sqlite::TableSeq;
 use crate::transfer::sqlite::dao::ConfigDao;
 use crate::transfer::sqlite::dao::config_history::ConfigHistoryDao;
 use crate::transfer::sqlite::dao::tenant::TenantDao;
-use crate::transfer::sqlite::dao::user::UserDao;
+use crate::transfer::sqlite::dao::user::{UserDO, UserDao};
 use rusqlite::Connection;
 
 pub async fn data_to_sqlite(data_file: &str, db_path: &str) -> anyhow::Result<()> {
@@ -129,5 +129,12 @@ fn insert_user(
     user_dao: &UserDao<'_>,
     record: TransferRecordRef<'_>,
 ) -> anyhow::Result<()> {
-    todo!()
+    let value_do = UserDo::from_bytes(&record.value)?;
+
+    let mut user_do: UserDO = value_do.into();
+    user_do.id = Some(table_seq.next_user_id());
+
+    user_dao.insert(&user_do)?;
+
+    Ok(())
 }

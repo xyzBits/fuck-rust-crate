@@ -32,7 +32,7 @@ impl<'a> MessageRead<'a> for TransferHeader<'a> {
                 Ok(8) => msg.version = r.read_uint64(bytes)?,
                 Ok(16) => msg.modify_time = r.read_uint64(bytes)?,
                 Ok(26) => msg.from_sys = r.read_string(bytes).map(Cow::Borrowed)?,
-                Ok(34) => msg.table_name_map_entities.push(r.read_message::<crate::TableNameMapEntity>(bytes)?),
+                Ok(34) => msg.table_name_map_entities.push(r.read_message::<TableNameMapEntity>(bytes)?),
                 Ok(42) => msg.extend = r.read_bytes(bytes).map(Cow::Borrowed)?,
                 Ok(t) => { r.read_unknown(bytes, t)?; }
                 Err(e) => return Err(e),

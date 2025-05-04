@@ -1,5 +1,5 @@
+use crate::common::pb::transfer::TransferHeader;
 use crate::common::protobuf_utils::FileMessageReader;
-use crate::transfer::TransferHeader;
 use crate::transfer::model::{TransferHeaderDto, TransferRecordRef};
 use quick_protobuf::BytesReader;
 use tokio::fs::OpenOptions;
